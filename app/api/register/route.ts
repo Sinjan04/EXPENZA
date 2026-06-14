@@ -26,6 +26,8 @@ export async function POST(req: Request) {
 
     return NextResponse.json(user);
   } catch (error: any) {
+  console.error("REGISTER ERROR:", error);
+
   if (error.code === "P2002") {
     return NextResponse.json(
       { error: "Email already exists" },
@@ -34,7 +36,10 @@ export async function POST(req: Request) {
   }
 
   return NextResponse.json(
-    { error: "Something went wrong" },
+    {
+      error: "Something went wrong",
+      details: error?.message || "Unknown error",
+    },
     { status: 500 }
   );
 }
