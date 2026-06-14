@@ -1,0 +1,847 @@
+"use client";
+import { useState } from "react";
+
+export default function AuthPage() {
+  const [isLogin, setIsLogin] = useState(true);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [fadeOut, setFadeOut] = useState(false);
+
+  const handleSubmit = async () => {
+  setLoading(true);
+  setFadeOut(true);
+
+  try {
+    if (isLogin) {
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
+
+      const data = await response.json();
+
+      localStorage.setItem(
+        "token",
+        data.token
+      );
+
+      await new Promise((resolve) =>
+        setTimeout(resolve, 900)
+      );
+
+      window.location.href =
+        "/dashboard";
+    } else {
+      const response = await fetch(
+        "/api/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+          body: JSON.stringify({
+            name,
+            email,
+            password,
+          }),
+        }
+      );
+
+      const data =
+        await response.json();
+
+      alert(JSON.stringify(data));
+    }
+  } finally {
+    setLoading(false);
+  }
+};
+  return (
+    <>
+      <style>{`
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;600&family=DM+Mono:wght@300;400;500&display=swap');
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+          --gold: #f0c040;
+          --gold-light: #ffe082;
+          --gold-dim: #7a6330;
+          --green: #34d399;
+          --red: #f87171;
+          --ink: #0c0d10;
+          --ink-2: #13141a;
+          --surface: #1a1b22;
+          --border: rgba(240,192,64,0.18);
+          --border-soft: rgba(255,255,255,0.06);
+          --text-primary: #f4f0e8;
+          --text-muted: #5a5670;
+          --text-mid: #9e98b0;
+        }
+
+.auth-root {
+          min-height: 100vh;
+          background: transparent;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          font-family: 'Sora', sans-serif;
+          overflow: hidden;
+          position: relative;
+        }
+
+@media (max-width: 1024px) {
+          .auth-root { 
+            grid-template-columns: 1fr; 
+            overflow-y: auto; 
+            overflow-x: hidden; 
+          }
+          .left-panel { display: none !important; }
+          .right-panel { 
+            padding: max(24px, env(safe-area-inset-top)) 16px max(40px, env(safe-area-inset-bottom)) 16px; 
+            align-items: flex-start; 
+          }
+          .form-shell { 
+            margin-top: 6vh; 
+            background: rgba(12, 13, 16, 0.65);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            padding: 32px 24px;
+            border-radius: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+          }
+          .hide-on-mobile { display: none; }
+          .terminal-header { align-items: flex-start; }
+        }
+
+        .mobile-brand {
+          display: none;
+          font-family: 'DM Mono', monospace;
+          font-size: 11px;
+          letter-spacing: 0.25em;
+          color: var(--gold);
+          text-transform: uppercase;
+          margin-bottom: 12px;
+        }
+
+        @media (max-width: 1024px) {
+          .mobile-brand { display: block; }
+        }
+
+/* ── ANIMATED BACKGROUND LAYER ── */
+        .bg-stage {
+  position: fixed;
+  inset: 0;
+  background: var(--ink);
+  pointer-events: none;
+  z-index: 1;
+}
+
+
+
+        /* Radial glow pools */
+        .glow-pool {
+          position: absolute;
+          border-radius: 50%;
+          filter: blur(100px);
+        }
+        .glow-pool-1 {
+          width: 700px; height: 700px;
+          background: radial-gradient(circle, rgba(240,192,64,0.22) 0%, transparent 65%);
+          top: -250px; left: -150px;
+          animation: poolDrift1 16s ease-in-out infinite alternate;
+        }
+        .glow-pool-2 {
+          width: 580px; height: 580px;
+          background: radial-gradient(circle, rgba(52,211,153,0.12) 0%, transparent 65%);
+          bottom: -180px; right: -120px;
+          animation: poolDrift2 20s ease-in-out infinite alternate;
+        }
+        .glow-pool-3 {
+          width: 360px; height: 360px;
+          background: radial-gradient(circle, rgba(240,192,64,0.1) 0%, transparent 70%);
+          top: 40%; left: 35%;
+          animation: poolDrift1 26s ease-in-out infinite alternate;
+          filter: blur(80px);
+        }
+        @keyframes poolDrift1 {
+          from { transform: translate(0, 0) scale(1); }
+          to   { transform: translate(70px, 50px) scale(1.18); }
+        }
+        @keyframes poolDrift2 {
+          from { transform: translate(0, 0) scale(1); }
+          to   { transform: translate(-55px, -70px) scale(1.12); }
+        }
+
+        
+        /* Floating transaction cards */
+        .txn-card {
+          position: absolute;
+          background: linear-gradient(145deg, rgba(255,255,255,0.055) 0%, rgba(12,13,16,0.82) 100%);
+          border: 1px solid rgba(255,255,255,0.1);
+          border-top: 1px solid rgba(255,255,255,0.18);
+          border-radius: 16px;
+          padding: 16px 20px;
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          animation: cardDrift ease-in-out infinite alternate;
+          pointer-events: none;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08);
+        }
+        .txn-label {
+          font-family: 'DM Mono', monospace;
+          font-size: 9px;
+          letter-spacing: 0.18em;
+          color: var(--text-mid);
+          text-transform: uppercase;
+          margin-bottom: 6px;
+          display: flex;
+          align-items: center;
+        }
+        .txn-amount {
+          font-family: 'Sora', sans-serif;
+          font-weight: 600;
+          font-size: 20px;
+          color: var(--text-primary);
+          letter-spacing: -0.03em;
+        }
+        .txn-amount.positive { color: var(--green); }
+        .txn-amount.negative { color: var(--red); }
+        .txn-amount.neutral  { color: var(--gold-light); }
+        .txn-sub {
+          font-family: 'DM Mono', monospace;
+          font-size: 9px;
+          color: var(--text-muted);
+          margin-top: 5px;
+          letter-spacing: 0.08em;
+        }
+        .txn-dot {
+          display: inline-block;
+          width: 5px; height: 5px;
+          border-radius: 50%;
+          margin-right: 7px;
+          flex-shrink: 0;
+        }
+        .txn-bar {
+          margin-top: 10px;
+          height: 2px;
+          border-radius: 2px;
+          background: rgba(255,255,255,0.07);
+          overflow: hidden;
+        }
+        .txn-bar-fill {
+          height: 100%;
+          border-radius: 2px;
+        }
+
+        .txn-card-1 {
+  top: 7%;
+  left: 20%;
+  width: 172px;
+  animation-duration: 8s;
+  animation-delay: 0s;
+  opacity: 0.85;
+}
+
+
+
+.txn-card-3 {
+  top: 18%;
+  right: 54%;
+  width: 175px;
+  animation-duration: 10s;
+  animation-delay: -1.5s;
+  opacity: 0.85;
+}
+
+.txn-card-4 {
+  top: 40%;
+  right: 56%;
+  width: 166px;
+  animation-duration: 14s;
+  animation-delay: -6s;
+  opacity: 0.85;
+}
+
+
+
+        @keyframes cardDrift {
+          0%   { transform: translateY(0px)  rotate(-0.4deg) scale(1); }
+          30%  { transform: translateY(-16px) rotate(0.5deg)  scale(1.01); }
+          65%  { transform: translateY(-8px)  rotate(-0.7deg) scale(0.99); }
+          100% { transform: translateY(-20px) rotate(0.4deg)  scale(1.01); }
+        }
+
+       
+        @keyframes scanMove {
+          0%   { top: -2px; opacity: 0; }
+          3%   { opacity: 0.5; }
+          97%  { opacity: 0.3; }
+          100% { top: 100%; opacity: 0; }
+        }
+
+        /* ── DIVIDER LINE ── */
+        .center-divider {
+          position: fixed;
+          top: 0; bottom: 0;
+          left: 50%;
+          width: 1px;
+          background: linear-gradient(
+  to bottom,
+  transparent,
+  rgba(201,168,76,0.08) 25%,
+  rgba(201,168,76,0.12) 50%,
+  rgba(201,168,76,0.08) 75%,
+  transparent
+);
+          z-index: 1;
+        }
+
+        /* ── LEFT PANEL ── */
+        .left-panel {
+          position: relative;
+          z-index: 10;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          padding: 0 72px;
+        }
+
+        .brand-tag {
+  font-family: 'Sora', sans-serif;
+  font-size: 34px;
+  font-weight: 300;
+  letter-spacing: 0.22em;
+  color: var(--gold-light);
+  margin-bottom: 28px;
+}
+  
+        
+
+        .hero-headline {
+          font-family: 'Sora', sans-serif;
+          font-size: clamp(42px, 4.8vw, 68px);
+          font-weight: 200;
+          line-height: 1.1;
+          color: var(--text-primary);
+          letter-spacing: -0.04em;
+        }
+        .hero-headline strong {
+          font-weight: 600;
+          color: var(--gold-light);
+        }
+        .hero-headline .accent-line {
+          display: block;
+          background: linear-gradient(90deg, var(--gold-light), var(--green));
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          font-weight: 600;
+        }
+
+        .hero-sub {
+          margin-top: 24px;
+          font-family: 'Sora', sans-serif;
+          font-size: 14px;
+          line-height: 1.75;
+          color: var(--text-mid);
+          max-width: 360px;
+          font-weight: 300;
+        }
+
+        .stat-row {
+          display: flex;
+          gap: 0;
+          margin-top: 48px;
+          padding-top: 36px;
+          border-top: 1px solid var(--border-soft);
+        }
+        .stat-item {
+          flex: 1;
+          padding-right: 24px;
+          border-right: 1px solid var(--border-soft);
+          margin-right: 24px;
+        }
+        .stat-item:last-child { border-right: none; margin-right: 0; }
+        .stat-num {
+          font-family: 'Sora', sans-serif;
+          font-size: 26px;
+          font-weight: 600;
+          color: var(--text-primary);
+          letter-spacing: -0.04em;
+        }
+        .stat-num span { color: var(--gold); }
+        .stat-label {
+          font-family: 'DM Mono', monospace;
+          font-size: 9px;
+          letter-spacing: 0.18em;
+          color: var(--text-muted);
+          text-transform: uppercase;
+          margin-top: 4px;
+        }
+
+        /* ── RIGHT PANEL ── */
+        .right-panel {
+          position: relative;
+          z-index: 10;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 40px 48px;
+        }
+
+        .form-shell {
+          width: 100%;
+          max-width: 420px;
+        }
+
+        /* Form top badge */
+        .terminal-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 32px;
+        }
+        .form-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          background: rgba(240,192,64,0.1);
+          border: 1px solid rgba(240,192,64,0.2);
+          border-radius: 100px;
+          padding: 5px 12px 5px 8px;
+        }
+        .badge-dot {
+          width: 6px; height: 6px;
+          border-radius: 50%;
+          background: var(--green);
+          box-shadow: 0 0 8px var(--green);
+          animation: dotPulse 2s ease-in-out infinite;
+        }
+        .badge-text {
+          font-family: 'DM Mono', monospace;
+          font-size: 9px;
+          letter-spacing: 0.18em;
+          color: var(--gold);
+          text-transform: uppercase;
+        }
+        .form-tagline {
+  font-family: 'Sora', sans-serif;
+  font-size: 12px;
+  font-weight: 300;
+  letter-spacing: 0.02em;
+  color: var(--text-mid);
+}
+
+        /* Tab switcher */
+        .tab-rail {
+          position: relative;
+          display: flex;
+          border: 1px solid var(--border-soft);
+          border-radius: 10px;
+          padding: 4px;
+          margin-bottom: 28px;
+          background: rgba(255,255,255,0.03);
+          gap: 2px;
+        }
+        .tab-pill {
+          position: absolute;
+          top: 4px; bottom: 4px;
+          width: calc(50% - 4px);
+          border-radius: 7px;
+          background: linear-gradient(135deg, var(--gold) 0%, #e8a020 100%);
+          transition: transform 0.38s cubic-bezier(.34,1.56,.64,1);
+          box-shadow: 0 2px 12px rgba(240,192,64,0.35);
+        }
+        .tab-pill.right { transform: translateX(100%); }
+
+        .tab-btn {
+          position: relative;
+          flex: 1;
+          background: none;
+          border: none;
+          cursor: pointer;
+          padding: 10px 0;
+          font-family: 'Sora', sans-serif;
+          font-size: 12px;
+          font-weight: 500;
+          letter-spacing: 0.04em;
+          transition: color 0.3s ease;
+          z-index: 1;
+          border-radius: 6px;
+        }
+        .tab-btn.active { color: var(--ink); }
+        .tab-btn.inactive { color: var(--text-muted); }
+        .tab-btn.inactive:hover { color: var(--text-mid); }
+
+/* Form heading */
+        .form-title {
+          font-family: 'Sora', sans-serif;
+          font-size: clamp(28px, 8vw, 32px);
+          font-weight: 300;
+          color: var(--text-primary);
+          letter-spacing: -0.04em;
+          line-height: 1.15;
+          margin-bottom: 6px;
+        }
+        .form-title strong {
+          font-weight: 600;
+          background: linear-gradient(100deg, var(--gold-light) 0%, var(--gold) 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+        .form-subtitle {
+          font-family: 'DM Mono', monospace;
+          font-size: 10px;
+          color: var(--text-muted);
+          letter-spacing: 0.12em;
+          margin-bottom: 32px;
+        }
+
+/* Inputs */
+        .field-wrap {
+          position: relative;
+          margin-bottom: 14px;
+        }
+        .field-wrap::after {
+          content: '';
+          position: absolute;
+          bottom: 0; left: 12px; right: 12px;
+          height: 1px;
+          background: linear-gradient(90deg, var(--green), var(--gold));
+          transform: scaleX(0);
+          transform-origin: left;
+          transition: transform 0.45s cubic-bezier(.23,1,.32,1);
+          border-radius: 1px;
+        }
+        .field-wrap:focus-within::after { transform: scaleX(1); }
+
+        .field-label {
+          display: block;
+          font-family: 'DM Mono', monospace;
+          font-size: 9px;
+          letter-spacing: 0.22em;
+          text-transform: uppercase;
+          color: var(--text-muted);
+          margin-bottom: 7px;
+          transition: color 0.25s ease;
+        }
+        .field-wrap:focus-within .field-label { color: var(--gold); }
+
+.field-input {
+          width: 100%;
+          background: rgba(255,255,255,0.03);
+          border: 1px solid var(--border-soft);
+          border-radius: 10px;
+          padding: 13px 16px;
+          color: var(--text-primary);
+          font-family: 'Sora', sans-serif;
+          font-size: 16px; /* Forces 16px to prevent iOS Safari auto-zoom bug */
+          font-weight: 300;
+          letter-spacing: -0.01em;
+          outline: none;
+          transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+          caret-color: var(--gold);
+        }
+        @media (min-width: 1025px) {
+          .field-input { font-size: 14px; }
+        }
+        .field-input::placeholder { color: var(--text-muted); }
+        .field-input:focus {
+          background: rgba(240,192,64,0.05);
+          border-color: rgba(240,192,64,0.25);
+          box-shadow: 0 0 0 3px rgba(240,192,64,0.07), 0 4px 16px rgba(0,0,0,0.2);
+        }
+
+        /* Submit button */
+        .submit-btn {
+          position: relative;
+          width: 100%;
+          margin-top: 10px;
+          padding: 16px;
+          background: linear-gradient(135deg, var(--gold) 0%, #e8a020 60%, #f0c040 100%);
+          border: none;
+          border-radius: 10px;
+          cursor: pointer;
+          font-family: 'Sora', sans-serif;
+          font-size: 13px;
+          letter-spacing: 0.04em;
+          font-weight: 600;
+          color: #0c0d10;
+          transition: transform 0.2s cubic-bezier(.34,1.56,.64,1), box-shadow 0.2s ease, filter 0.2s ease;
+          overflow: hidden;
+          box-shadow: 0 4px 24px rgba(240,192,64,0.3), 0 1px 0 rgba(255,255,255,0.2) inset;
+        }
+        .submit-btn::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.25) 50%, transparent 100%);
+          transform: translateX(-100%);
+          transition: transform 0.55s ease;
+        }
+        .submit-btn:hover::before { transform: translateX(100%); }
+        .submit-btn:hover { transform: translateY(-2px) scale(1.01); box-shadow: 0 8px 32px rgba(240,192,64,0.45); filter: brightness(1.06); }
+        .submit-btn:active { transform: translateY(0) scale(0.99); box-shadow: 0 2px 12px rgba(240,192,64,0.25); }
+
+        /* Field reveal animation */
+        .field-slide {
+          animation: slideIn 0.38s cubic-bezier(.34,1.56,.64,1) both;
+        }
+        @keyframes slideIn {
+          from { opacity: 0; transform: translateY(-10px) scale(0.98); }
+          to   { opacity: 1; transform: translateY(0)    scale(1); }
+        }
+
+        /* Form shell entrance */
+        .form-shell {
+          animation: shellIn 0.7s cubic-bezier(.23,1,.32,1) both;
+        }
+        @keyframes shellIn {
+          from { opacity: 0; transform: translateY(24px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Left panel entrance */
+        .left-panel > div {
+          animation: panelIn 0.9s cubic-bezier(.23,1,.32,1) both;
+          animation-delay: 0.1s;
+        }
+        @keyframes panelIn {
+          from { opacity: 0; transform: translateX(-20px); }
+          to   { opacity: 1; transform: translateX(0); }
+        }
+         .spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(0,0,0,0.25);
+  border-top: 2px solid #000;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+  .auth-fade-out {
+  animation: authFadeOut 0.6s ease forwards;
+}
+
+@keyframes authFadeOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  to {
+    opacity: 0;
+transform: translateY(-8px);
+  }
+}
+      `}
+      
+      </style>
+
+      {/* ── BACKGROUND STAGE ── */}
+      <div
+  className={`bg-stage ${
+    fadeOut ? "auth-fade-out" : ""
+  }`}
+>
+        <div className="bg-grid" />
+        <div className="glow-pool glow-pool-1" />
+        <div className="glow-pool glow-pool-2" />
+        <div className="glow-pool glow-pool-3" />
+        <div className="scan-line" />
+
+        
+
+        {/* Floating transaction cards */}
+<div className="txn-card txn-card-1">
+          <div className="txn-label"><span className="txn-dot" style={{background:'#34d399'}} />Salary received</div>
+          <div className="txn-amount positive">+₹84,500</div>
+          <div className="txn-sub">HDFC · Oct 01 · 09:14 AM</div>
+          <div className="txn-bar"><div className="txn-bar-fill" style={{width:'78%', background:'#34d399'}} /></div>
+        </div>
+        
+        <div className="txn-card txn-card-3">
+          <div className="txn-label"><span className="txn-dot" style={{background:'#f87171'}} />Paris travel</div>
+          <div className="txn-amount negative">−€420</div>
+          <div className="txn-sub">Amex · Hotel + Flight</div>
+          <div className="txn-bar"><div className="txn-bar-fill" style={{width:'44%', background:'#f87171'}} /></div>
+        </div>
+        <div className="txn-card txn-card-4">
+          <div className="txn-label"><span className="txn-dot" style={{background:'#34d399'}} />Nikkei dividend</div>
+          <div className="txn-amount positive">¥18,000</div>
+          <div className="txn-sub">Quarterly payout</div>
+          <div className="txn-bar"><div className="txn-bar-fill" style={{width:'55%', background:'#34d399'}} /></div>
+        </div>
+        
+      </div>
+
+      {/* Center divider */}
+      <div className="center-divider" />
+
+      <main
+  className={`auth-root ${
+    fadeOut ? "auth-fade-out" : ""
+  }`}
+>
+        {/* ── LEFT PANEL ── */}
+        <div className="left-panel" style={{display:'flex'}}>
+          <div>
+<div className="brand-tag">
+  EXPENZA
+</div>
+            <h1 className="hero-headline">
+              Your money,<br />
+              <span className="accent-line">fully alive.</span>
+            </h1>
+
+            <p className="hero-sub">
+              One place for every rupee, dollar, and euro. Track spending, grow savings, and finally understand where it all goes.
+            </p>
+
+            <div className="stat-row">
+              <div className="stat-item">
+                <div className="stat-num"><span>₹</span>2.4Cr</div>
+                <div className="stat-label">Tracked daily</div>
+              </div>
+              <div className="stat-item">
+                <div className="stat-num">98<span>%</span></div>
+                <div className="stat-label">Accuracy</div>
+              </div>
+              <div className="stat-item">
+                <div className="stat-num">24<span>/7</span></div>
+                <div className="stat-label">Live sync</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── RIGHT PANEL ── */}
+        <div className="right-panel">
+          <div className="form-shell">
+
+{/* Form badge */}
+            <div className="terminal-header">
+  <div className="form-tagline">
+    <div className="mobile-brand">EXPENZA</div>
+    Know where every rupee goes.
+  </div>
+
+  <div className="form-tagline hide-on-mobile">
+    Track • Save • Grow
+  </div>
+</div>
+            {/* Tab switcher */}
+            <div className="tab-rail">
+              <div className={`tab-pill ${isLogin ? '' : 'right'}`} />
+              <button
+                className={`tab-btn ${isLogin ? 'active' : 'inactive'}`}
+                onClick={() => setIsLogin(true)}
+              >
+                Login
+              </button>
+              <button
+                className={`tab-btn ${!isLogin ? 'active' : 'inactive'}`}
+                onClick={() => setIsLogin(false)}
+              >
+                Register
+              </button>
+            </div>
+
+{/* Heading */}
+            <div className="form-title">
+              {isLogin
+                ? (<>Good to see<br />you <strong>again.</strong></>)
+                : (<>Let's get you<br /><strong>started.</strong></>)}
+            </div>
+            <div className="form-subtitle">
+              {isLogin ? '// enter your details below' : '// takes less than a minute'}
+            </div>
+
+            {/* Fields */}
+            <div>
+              {!isLogin && (
+                <div className="field-wrap field-slide">
+                  <label className="field-label">Full Name</label>
+                  <input
+                    type="text"
+                    placeholder="Your full name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="field-input"
+                  />
+                </div>
+              )}
+
+              <div className="field-wrap">
+                <label className="field-label">Email Address</label>
+                <input
+                  type="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="field-input"
+                />
+              </div>
+
+              <div className="field-wrap">
+                <label className="field-label">Password</label>
+                <input
+                  type="password"
+                  placeholder="••••••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="field-input"
+                />
+              </div>
+
+              <button
+  className="submit-btn"
+  onClick={handleSubmit}
+  disabled={loading}
+>
+  {loading ? (
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        gap: "10px",
+      }}
+    >
+      <div className="spinner" />
+      Entering...
+    </div>
+  ) : (
+    isLogin
+      ? "→ Sign In"
+      : "→ Create Account"
+  )}
+</button>
+            </div>
+
+          </div>
+        </div>
+      </main>
+    </>
+  );
+}
