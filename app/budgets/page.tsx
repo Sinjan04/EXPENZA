@@ -796,7 +796,7 @@ const handleAddBudget = async () => {
 {/* Delete Confirmation Modal */}
         {showDeleteModal && (
           <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center bg-[#0c0d10]/90 backdrop-blur-md p-0 md:p-4 fade-in-up">
-            <div className="glass-card w-full max-w-sm rounded-t-[32px] md:rounded-[32px] p-6 md:p-8 pb-10 md:pb-8 shadow-2xl relative border-t border-[#f87171]/20">
+            <div className="glass-card w-full max-w-sm rounded-t-[32px] md:rounded-[32px] p-6 md:p-8 pb-10 md:pb-8 shadow-2xl relative border-t border-[#f87171]/20"> 
               <div className="w-16 h-16 rounded-full bg-[#f87171]/10 flex items-center justify-center text-2xl mb-6 text-[#f87171] border border-[#f87171]/20 mx-auto">
                 🗑️
               </div>
