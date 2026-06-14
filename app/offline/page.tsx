@@ -1,3 +1,4 @@
+"use client";
 export default function OfflinePage() {
   return (
     <main className="min-h-screen bg-[#0c0d10] flex flex-col items-center justify-center p-6 text-[#f4f0e8]" style={{ fontFamily: "'Sora', sans-serif" }}>
