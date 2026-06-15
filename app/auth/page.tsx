@@ -812,6 +812,18 @@ transform: translateY(-8px);
               )}
 
 <div className="field-wrap">
+  <label className="field-label">Email</label>
+
+  <input
+    type="email"
+    placeholder="you@example.com"
+    value={email}
+    onChange={(e) => setEmail(e.target.value)}
+    className="field-input"
+  />
+</div>
+
+              <div className="field-wrap">
   <label className="field-label">Password</label>
 
   <div style={{ position: "relative" }}>
@@ -838,25 +850,10 @@ transform: translateY(-8px);
         color: "#9e98b0",
       }}
     >
-      {showPassword ? (
-        <EyeOff size={18} />
-      ) : (
-        <Eye size={18} />
-      )}
+      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
     </button>
   </div>
 </div>
-
-              <div className="field-wrap">
-                <label className="field-label">Password</label>
-                <input
-                  type="password"
-                  placeholder="••••••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="field-input"
-                />
-              </div>
 
               <button
   className="submit-btn"
