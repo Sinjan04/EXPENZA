@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -8,6 +9,7 @@ export default function AuthPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [fadeOut, setFadeOut] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
 const handleSubmit = async () => {
   setLoading(true);
@@ -809,16 +811,41 @@ transform: translateY(-8px);
                 </div>
               )}
 
-              <div className="field-wrap">
-                <label className="field-label">Email Address</label>
-                <input
-                  type="email"
-                  placeholder="you@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="field-input"
-                />
-              </div>
+<div className="field-wrap">
+  <label className="field-label">Password</label>
+
+  <div style={{ position: "relative" }}>
+    <input
+      type={showPassword ? "text" : "password"}
+      placeholder="••••••••••••"
+      value={password}
+      onChange={(e) => setPassword(e.target.value)}
+      className="field-input"
+      style={{ paddingRight: "48px" }}
+    />
+
+    <button
+      type="button"
+      onClick={() => setShowPassword(!showPassword)}
+      style={{
+        position: "absolute",
+        right: "14px",
+        top: "50%",
+        transform: "translateY(-50%)",
+        background: "transparent",
+        border: "none",
+        cursor: "pointer",
+        color: "#9e98b0",
+      }}
+    >
+      {showPassword ? (
+        <EyeOff size={18} />
+      ) : (
+        <Eye size={18} />
+      )}
+    </button>
+  </div>
+</div>
 
               <div className="field-wrap">
                 <label className="field-label">Password</label>
