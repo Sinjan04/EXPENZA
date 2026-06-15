@@ -3,19 +3,21 @@ import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(req: Request) {
-  const token = req.headers.get("authorization");
+const authHeader = req.headers.get("authorization");
 
-  if (!token) {
-    return NextResponse.json(
-      { error: "No token provided" },
-      { status: 401 }
-    );
-  }
-
-  const decoded = jwt.verify(
-    token,
-    process.env.JWT_SECRET!
+if (!authHeader) {
+  return NextResponse.json(
+    { error: "No token provided" },
+    { status: 401 }
   );
+}
+
+const token = authHeader.replace("Bearer ", "");
+
+const decoded = jwt.verify(
+  token,
+  process.env.JWT_SECRET!
+);
 
   const userData = decoded as {
     userId: string;

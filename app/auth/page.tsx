@@ -27,6 +27,7 @@ export default function AuthPage() {
       });
 
       const data = await response.json();
+      console.log("LOGIN RESPONSE:", data);
 
       localStorage.setItem(
         "token",
