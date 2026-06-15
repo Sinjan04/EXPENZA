@@ -28,7 +28,14 @@ export default function AuthPage() {
 
 const data = await response.json();
 
-console.log("LOGIN RESPONSE:", data);
+if (!response.ok) {
+  alert(data.error || "Registration failed");
+  return;
+}
+
+setIsLogin(true);
+
+alert("Account created successfully. Please login.");
 
 if (!response.ok) {
   alert(data.error || "Login failed");
