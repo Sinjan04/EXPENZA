@@ -9,7 +9,7 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [fadeOut, setFadeOut] = useState(false);
 
-  const handleSubmit = async () => {
+const handleSubmit = async () => {
   setLoading(true);
   setFadeOut(true);
 
@@ -26,59 +26,57 @@ export default function AuthPage() {
         }),
       });
 
-const data = await response.json();
+      const data = await response.json();
 
-if (!response.ok) {
-  alert(data.error || "Registration failed");
-  return;
-}
+      if (!response.ok) {
+        alert(data.error || "Login failed");
+        setLoading(false);
+        setFadeOut(false);
+        return;
+      }
 
-setIsLogin(true);
+      localStorage.setItem("token", data.token);
 
-alert("Account created successfully. Please login.");
+      alert("Logged in successfully");
 
-if (!response.ok) {
-  alert(data.error || "Login failed");
-  setLoading(false);
-  return;
-}
-
-if (!data.token) {
-  console.error("NO TOKEN RETURNED:", data);
-  alert("No token returned from server");
-  setLoading(false);
-  return;
-}
-
-localStorage.setItem("token", data.token);
-console.log("TOKEN SAVED:", data.token);
       await new Promise((resolve) =>
-        setTimeout(resolve, 900)
+        setTimeout(resolve, 500)
       );
 
-      window.location.href =
-        "/dashboard";
+      window.location.href = "/dashboard";
     } else {
-      const response = await fetch(
-        "/api/register",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type":
-              "application/json",
-          },
-          body: JSON.stringify({
-            name,
-            email,
-            password,
-          }),
-        }
+      const response = await fetch("/api/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.error || "Registration failed");
+        setLoading(false);
+        setFadeOut(false);
+        return;
+      }
+
+      alert("Account created successfully");
+
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+      }
+
+      await new Promise((resolve) =>
+        setTimeout(resolve, 500)
       );
 
-      const data =
-        await response.json();
-
-      alert(JSON.stringify(data));
+      window.location.href = "/dashboard";
     }
   } finally {
     setLoading(false);
