@@ -26,14 +26,25 @@ export default function AuthPage() {
         }),
       });
 
-      const data = await response.json();
-      console.log("LOGIN RESPONSE:", data);
+const data = await response.json();
 
-      localStorage.setItem(
-        "token",
-        data.token
-      );
+console.log("LOGIN RESPONSE:", data);
 
+if (!response.ok) {
+  alert(data.error || "Login failed");
+  setLoading(false);
+  return;
+}
+
+if (!data.token) {
+  console.error("NO TOKEN RETURNED:", data);
+  alert("No token returned from server");
+  setLoading(false);
+  return;
+}
+
+localStorage.setItem("token", data.token);
+console.log("TOKEN SAVED:", data.token);
       await new Promise((resolve) =>
         setTimeout(resolve, 900)
       );
