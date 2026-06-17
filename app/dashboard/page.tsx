@@ -477,21 +477,26 @@ useEffect(() => {
 /* Custom Scrollbar for list */
         .hide-scroll::-webkit-scrollbar { width: 0px; background: transparent; }
         
-        /* Native App Carousel Physics */
+/* Native App Carousel Physics */
         @media (max-width: 1024px) {
           .mobile-carousel {
             display: flex;
             overflow-x: auto;
             scroll-snap-type: x mandatory;
-            gap: 16px;
+            gap: 24px;
             padding-bottom: 24px;
-            margin: 0 -24px;
-            padding: 0 24px 20px 24px;
+            margin: 0;
+            padding: 0 0 20px 0;
             scrollbar-width: none;
             -ms-overflow-style: none;
           }
           .mobile-carousel::-webkit-scrollbar { display: none; }
-          .mobile-carousel > * { flex: 0 0 88vw; scroll-snap-align: center; height: 100%; }
+          .mobile-carousel > * { 
+            flex: 0 0 100%; 
+            scroll-snap-align: center; 
+            scroll-snap-stop: always; 
+            height: 100%; 
+          }
         }
       `}</style>
 
@@ -722,11 +727,14 @@ useEffect(() => {
                 </div>
               </div>
 
-              {/*{/* 3. Analytics Header & Carousel Start */}
-              <div className="block lg:hidden mt-2 mb-[-8px] px-1">
-                <div className="flex justify-between items-end">
+              {/* 3. Analytics Header & Carousel Start */}
+              <div className="block lg:hidden mt-4 mb-2">
+                <div className="flex justify-between items-center">
                   <h3 className="text-lg font-light tracking-wide text-[#f4f0e8]">Analytics Center</h3>
-                  <p className="font-mono text-[9px] uppercase tracking-widest text-[#5a5670] animate-pulse">Swipe →</p>
+                  <div className="flex items-center gap-2 bg-[#f0c040]/10 border border-[#f0c040]/20 rounded-full px-3 py-1.5 shadow-[inset_0_0_8px_rgba(240,192,64,0.1)]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#f0c040] animate-pulse" />
+                    <span className="font-mono text-[9px] tracking-[0.2em] text-[#f0c040] uppercase mt-0.5">Swipe</span>
+                  </div>
                 </div>
               </div>
 
