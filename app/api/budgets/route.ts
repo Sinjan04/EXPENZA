@@ -1,30 +1,38 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export async function GET(req: Request) {
-  const token = req.headers.get("authorization");
+  const session = await getServerSession(authOptions);
+  let userId: string | null = null;
 
-  if (!token) {
+  // Hybrid Auth Check
+  if (session?.user) {
+    userId = (session.user as any).userId;
+  } else {
+    const token = req.headers.get("authorization");
+    if (token) {
+      try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string };
+        userId = decoded.userId;
+      } catch (e) {
+        // Invalid token
+      }
+    }
+  }
+
+  if (!userId) {
     return NextResponse.json(
-      { error: "No token provided" },
+      { error: "Unauthorized" },
       { status: 401 }
     );
   }
 
-  const decoded = jwt.verify(
-    token,
-    process.env.JWT_SECRET!
-  );
-
-  const userData = decoded as {
-    userId: string;
-    email: string;
-  };
-
   const budgets = await prisma.budget.findMany({
     where: {
-      userId: userData.userId,
+      userId: userId,
     },
   });
 
@@ -32,24 +40,30 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  const token = req.headers.get("authorization");
+  const session = await getServerSession(authOptions);
+  let userId: string | null = null;
 
-  if (!token) {
+  // Hybrid Auth Check
+  if (session?.user) {
+    userId = (session.user as any).userId;
+  } else {
+    const token = req.headers.get("authorization");
+    if (token) {
+      try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string };
+        userId = decoded.userId;
+      } catch (e) {
+        // Invalid token
+      }
+    }
+  }
+
+  if (!userId) {
     return NextResponse.json(
-      { error: "No token provided" },
+      { error: "Unauthorized" },
       { status: 401 }
     );
   }
-
-  const decoded = jwt.verify(
-    token,
-    process.env.JWT_SECRET!
-  );
-
-  const userData = decoded as {
-    userId: string;
-    email: string;
-  };
 
   const body = await req.json();
   
@@ -71,7 +85,7 @@ export async function POST(req: Request) {
     data: {
       category: body.category,
       limit: body.limit,
-      userId: userData.userId,
+      userId: userId,
     },
   });
 
@@ -79,11 +93,27 @@ export async function POST(req: Request) {
 }
 
 export async function DELETE(req: Request) {
-  const token = req.headers.get("authorization");
+  const session = await getServerSession(authOptions);
+  let userId: string | null = null;
 
-  if (!token) {
+  // Hybrid Auth Check
+  if (session?.user) {
+    userId = (session.user as any).userId;
+  } else {
+    const token = req.headers.get("authorization");
+    if (token) {
+      try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string };
+        userId = decoded.userId;
+      } catch (e) {
+        // Invalid token
+      }
+    }
+  }
+
+  if (!userId) {
     return NextResponse.json(
-      { error: "No token provided" },
+      { error: "Unauthorized" },
       { status: 401 }
     );
   }
@@ -111,17 +141,30 @@ export async function DELETE(req: Request) {
   });
 }
 export async function PUT(req: Request) {
-  const token = req.headers.get("authorization");
+  const session = await getServerSession(authOptions);
+  let userId: string | null = null;
 
-  if (!token) {
+  // Hybrid Auth Check
+  if (session?.user) {
+    userId = (session.user as any).userId;
+  } else {
+    const token = req.headers.get("authorization");
+    if (token) {
+      try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string };
+        userId = decoded.userId;
+      } catch (e) {
+        // Invalid token
+      }
+    }
+  }
+
+  if (!userId) {
     return NextResponse.json(
-      { error: "No token provided" },
+      { error: "Unauthorized" },
       { status: 401 }
     );
   }
-
-  // Verify the token to ensure the user is authenticated
-  jwt.verify(token, process.env.JWT_SECRET!);
 
   const body = await req.json();
 
