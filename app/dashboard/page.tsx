@@ -350,7 +350,7 @@ useEffect(() => {
     return "Good evening";
   }, []);
 
-  // Group transactions by time periods
+ // Group transactions by time periods (Strictly limited to Top 3 for Dashboard)
   const groupedTransactions = useMemo(() => {
     const groups: { label: string; items: any[] }[] = [
       { label: "Today", items: [] },
@@ -364,7 +364,8 @@ useEffect(() => {
     const yesterday = today - 86400000;
     const lastWeek = today - 86400000 * 7;
 
-    transactions.forEach((t) => {
+    // Slice to only process the 3 most recent entries
+    transactions.slice(0, 3).forEach((t) => {
       const txTime = new Date(t.createdAt || Date.now()).getTime();
       if (txTime >= today) groups[0].items.push(t);
       else if (txTime >= yesterday) groups[1].items.push(t);
@@ -437,6 +438,21 @@ useEffect(() => {
         @keyframes fadeInUp {
           from { opacity: 0; transform: translateY(20px); }
           to { opacity: 1; transform: translateY(0); }
+        }
+          /* Native Bottom Sheet Animations */
+        .sheet-overlay {
+          animation: fadeIn 0.3s ease both;
+        }
+        .sheet-slide-up {
+          animation: sheetSlideUp 0.5s cubic-bezier(0.32, 0.72, 0, 1) both;
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes sheetSlideUp {
+          from { transform: translateY(100%); }
+          to { transform: translateY(0); }
         }
 
         .glow-pool-gold {
@@ -873,16 +889,16 @@ useEffect(() => {
 
             {/* RIGHT COLUMN */}
             <div className="lg:col-span-4 flex flex-col gap-8">
-              {/* Recent Transactions List */}
-              <div className="glass-card rounded-3xl p-6 flex flex-col h-[480px] transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl">
+{/* Recent Transactions List */}
+              <div className="glass-card rounded-3xl p-6 flex flex-col h-auto transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl mb-8">
                 <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-lg font-light tracking-wide text-[#f4f0e8]">Ledger</h3>
-                  <span className="font-mono text-[10px] tracking-widest text-[#5a5670] uppercase bg-white/[0.03] px-3 py-1 rounded-full border border-white/[0.05]">
-                    {transactions.length} Entries
+                  <h3 className="text-lg font-light tracking-wide text-[#f4f0e8]">Recent Activity</h3>
+                  <span className="font-mono text-[10px] tracking-widest text-[#f0c040] uppercase bg-[#f0c040]/10 px-3 py-1 rounded-full border border-[#f0c040]/20">
+                    Latest 3
                   </span>
                 </div>
 
-                <div className="flex-1 overflow-y-auto hide-scroll pr-2 space-y-5 relative">
+                <div className="flex-1 overflow-visible pr-2 space-y-5 relative">
                   {groupedTransactions.length === 0 ? (
                     <div className="h-full flex flex-col items-center justify-center relative fade-in-up">
                       <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#0c0d10]/60 pointer-events-none rounded-2xl z-0" />
@@ -1218,11 +1234,17 @@ useEffect(() => {
           </div>
         )}
 
-{/* Add Transaction Modal */}
+{/* Add Transaction Bottom Sheet */}
         {showModal && (
-          <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center bg-[#0c0d10]/80 backdrop-blur-md p-0 md:p-4 fade-in-up">
-            <div className="glass-card w-full max-w-md rounded-t-[32px] md:rounded-[32px] p-6 md:p-8 pb-10 md:pb-8 shadow-2xl relative max-h-[90vh] overflow-y-auto hide-scroll">
-              <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-[#f0c040] to-transparent opacity-20" />
+          <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center bg-[#0c0d10]/80 backdrop-blur-sm p-0 md:p-4 sheet-overlay">
+            {/* Click outside to close */}
+            <div className="absolute inset-0" onClick={() => setShowModal(false)} />
+            
+            <div className="glass-card w-full max-w-md rounded-t-[32px] md:rounded-[32px] p-6 md:p-8 pb-12 md:pb-8 shadow-2xl relative max-h-[90vh] overflow-y-auto hide-scroll sheet-slide-up">
+              {/* Mobile Drag Pill */}
+              <div className="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-6 md:hidden" />
+              
+              <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-[#f0c040] to-transparent opacity-20 hidden md:block" />
               
               <div className="mb-8">
                 <span className="font-mono text-[10px] tracking-[0.2em] text-[#f0c040] uppercase mb-2 block">
@@ -1329,17 +1351,30 @@ useEffect(() => {
           </div>
 )}
 
-        {/* Mobile Bottom Navigation Bar */}
-        <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0c0d10]/90 backdrop-blur-xl border-t border-white/[0.05] pb-6 pt-2 px-6">
-          <div className="flex items-center justify-around">
-            <div className="flex flex-col items-center gap-1 text-[#f0c040]">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
-              <span className="text-[10px] font-medium tracking-wide">Dashboard</span>
+{/* Mobile App Dock (Bottom Nav) */}
+        <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0c0d10]/80 backdrop-blur-2xl border-t border-white/[0.05] pb-safe pt-2 px-6 shadow-[0_-8px_32px_rgba(0,0,0,0.4)]">
+          <div className="flex items-center justify-between pb-4">
+            
+            <div className="flex flex-col items-center gap-1 text-[#f0c040] flex-1">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+              <span className="text-[10px] font-medium tracking-wide mt-1">Dashboard</span>
             </div>
-            <Link href="/budgets" className="flex flex-col items-center gap-1 text-[#5a5670] hover:text-[#e0dceb] transition-colors">
+
+            {/* Central Floating Action Button */}
+            <div className="flex-1 flex justify-center -mt-8 relative z-50">
+              <button 
+                onClick={() => { setTransactionError(""); setShowModal(true); }}
+                className="w-14 h-14 rounded-full bg-gradient-to-tr from-[#e8a020] to-[#f0c040] text-black shadow-[0_8px_24px_rgba(240,192,64,0.4)] flex items-center justify-center transform active:scale-95 transition-all"
+              >
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              </button>
+            </div>
+
+            <Link href="/budgets" className="flex flex-col items-center gap-1 text-[#5a5670] hover:text-[#e0dceb] transition-colors flex-1">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-              <span className="text-[10px] font-medium tracking-wide">Budgets</span>
+              <span className="text-[10px] font-medium tracking-wide mt-1">Budgets</span>
             </Link>
+
           </div>
         </div>
       </main>
