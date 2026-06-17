@@ -498,6 +498,15 @@ useEffect(() => {
             height: 100%; 
           }
         }
+
+        /* Premium Swipe Arrow Animation */
+        @keyframes swipeHint {
+          0%, 100% { transform: translateX(0); opacity: 0.4; color: #5a5670; }
+          50% { transform: translateX(4px); opacity: 1; color: #f0c040; }
+        }
+        .animate-swipe-hint { 
+          animation: swipeHint 2s cubic-bezier(0.4, 0, 0.2, 1) infinite; 
+        }
       `}</style>
 
       <main className="min-h-screen pb-24 md:pb-0 bg-[#0c0d10] text-[#f4f0e8] font-sora relative overflow-hidden selection:bg-[#f0c040]/30 selection:text-white">
@@ -729,12 +738,17 @@ useEffect(() => {
 
               {/* 3. Analytics Header & Carousel Start */}
               <div className="block lg:hidden mt-4 mb-2">
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-end px-1">
                   <h3 className="text-lg font-light tracking-wide text-[#f4f0e8]">Analytics Center</h3>
-                  <div className="flex items-center gap-2 bg-[#f0c040]/10 border border-[#f0c040]/20 rounded-full px-3 py-1.5 shadow-[inset_0_0_8px_rgba(240,192,64,0.1)]">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#f0c040] animate-pulse" />
-                    <span className="font-mono text-[9px] tracking-[0.2em] text-[#f0c040] uppercase mt-0.5">Swipe</span>
+                  
+                  {/* Ultra-Minimalist Swipe Hint */}
+                  <div className="flex items-center gap-1.5 text-[#5a5670] select-none">
+                    <span className="font-mono text-[9px] tracking-[0.25em] uppercase pb-[1px]">Swipe</span>
+                    <svg className="w-3.5 h-3.5 animate-swipe-hint" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
                   </div>
+
                 </div>
               </div>
 
