@@ -474,8 +474,25 @@ useEffect(() => {
           outline: none;
         }
 
-        /* Custom Scrollbar for list */
+/* Custom Scrollbar for list */
         .hide-scroll::-webkit-scrollbar { width: 0px; background: transparent; }
+        
+        /* Native App Carousel Physics */
+        @media (max-width: 1024px) {
+          .mobile-carousel {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            gap: 16px;
+            padding-bottom: 24px;
+            margin: 0 -24px;
+            padding: 0 24px 20px 24px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+          }
+          .mobile-carousel::-webkit-scrollbar { display: none; }
+          .mobile-carousel > * { flex: 0 0 88vw; scroll-snap-align: center; height: 100%; }
+        }
       `}</style>
 
       <main className="min-h-screen pb-24 md:pb-0 bg-[#0c0d10] text-[#f4f0e8] font-sora relative overflow-hidden selection:bg-[#f0c040]/30 selection:text-white">
@@ -642,52 +659,78 @@ useEffect(() => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             {/* LEFT COLUMN */}
             <div className="lg:col-span-8 flex flex-col gap-8">
-              {/* Hero Statistics Section */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {/* Net Worth */}
-                <div className="glass-card rounded-2xl p-6 group hover:-translate-y-1 transition-all duration-300">
-                  <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#5a5670] mb-3 flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#f0c040]" /> Net Worth
-                  </p>
-                  <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">
+{/* 1. Mobile-Native Hero Hub */}
+              <div className="flex flex-col gap-3">
+                <div className="glass-card rounded-[32px] p-8 md:p-10 flex flex-col items-center justify-center text-center relative overflow-hidden transition-all duration-300 hover:-translate-y-1">
+                  <div className="absolute top-0 right-0 w-48 h-48 bg-[#f0c040]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+                  <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#5a5670] mb-3">Total Balance</p>
+                  <h2 className="text-4xl md:text-5xl font-semibold tracking-tight text-[#f4f0e8]">
                     <span className="text-[#9e98b0] font-light mr-1">₹</span>
                     {Math.round(animatedBalance).toLocaleString('en-IN')}
                   </h2>
                 </div>
 
-                {/* Income */}
-                <div className="glass-card rounded-2xl p-6 group hover:-translate-y-1 transition-all duration-300">
-                  <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#5a5670] mb-3 flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#34d399]" /> Income
-                  </p>
-                  <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">
-                    <span className="text-[#9e98b0] font-light mr-1">₹</span>
-                    {dashboardData.totalIncome.toLocaleString('en-IN')}
-                  </h2>
-                </div>
-
-                {/* Expenses */}
-                <div className="glass-card rounded-2xl p-6 group hover:-translate-y-1 transition-all duration-300">
-                  <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#5a5670] mb-3 flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#f87171]" /> Expenses
-                  </p>
-                  <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">
-                    <span className="text-[#9e98b0] font-light mr-1">₹</span>
-                    {Math.round(animatedExpense).toLocaleString('en-IN')}
-                  </h2>
-                </div>
-
-                {/* Savings */}
-                <div className="glass-card rounded-2xl p-6 group hover:-translate-y-1 transition-all duration-300">
-                  <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#5a5670] mb-3 flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#3b82f6]" /> Savings
-                  </p>
-                  <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">
-                    <span className="text-[#9e98b0] font-light mr-1">₹</span>
-                    {Math.round(animatedSavings).toLocaleString('en-IN')}
-                  </h2>
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="glass-card rounded-2xl p-4 text-center group transition-all hover:bg-white/[0.04]">
+                    <p className="font-mono text-[9px] uppercase tracking-widest text-[#5a5670] mb-1">Income</p>
+                    <p className="text-[12px] sm:text-[14px] font-semibold text-[#34d399] tracking-tight truncate">₹{dashboardData.totalIncome.toLocaleString('en-IN')}</p>
+                  </div>
+                  <div className="glass-card rounded-2xl p-4 text-center group transition-all hover:bg-white/[0.04]">
+                    <p className="font-mono text-[9px] uppercase tracking-widest text-[#5a5670] mb-1">Expense</p>
+                    <p className="text-[12px] sm:text-[14px] font-semibold text-[#f87171] tracking-tight truncate">₹{dashboardData.totalExpense.toLocaleString('en-IN')}</p>
+                  </div>
+                  <div className="glass-card rounded-2xl p-4 text-center group transition-all hover:bg-white/[0.04]">
+                    <p className="font-mono text-[9px] uppercase tracking-widest text-[#5a5670] mb-1">Saved</p>
+                    <p className="text-[12px] sm:text-[14px] font-semibold text-[#3b82f6] tracking-tight truncate">₹{savings.toLocaleString('en-IN')}</p>
+                  </div>
                 </div>
               </div>
+
+              {/* 2. Priority Ledger (Mobile Only - Forces transactions to the top) */}
+              <div className="block lg:hidden w-full mt-4">
+                <div className="glass-card rounded-3xl p-6 flex flex-col h-auto transition-all duration-300">
+                  <div className="flex justify-between items-center mb-6">
+                    <h3 className="text-lg font-light tracking-wide text-[#f4f0e8]">Recent Activity</h3>
+                    <span className="font-mono text-[10px] tracking-widest text-[#f0c040] uppercase bg-[#f0c040]/10 px-3 py-1 rounded-full border border-[#f0c040]/20">Latest 3</span>
+                  </div>
+                  <div className="flex-1 overflow-visible space-y-4">
+                    {groupedTransactions.length === 0 ? (
+                      <p className="text-[13px] text-[#5a5670] text-center py-4">No recent activity.</p>
+                    ) : (
+                      groupedTransactions.map((group) => (
+                        <div key={group.label} className="space-y-3">
+                          {group.items.map((transaction) => (
+                            <div key={transaction.id} className="flex items-center justify-between p-3.5 rounded-2xl bg-white/[0.015] border border-white/[0.04]">
+                              <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-xl bg-black/40 border border-white/[0.05] flex items-center justify-center text-lg">{getCategoryEmoji(transaction.category)}</div>
+                                <div>
+                                  <p className="text-[14px] font-medium text-[#f4f0e8] truncate max-w-[120px]">{transaction.note || transaction.category}</p>
+                                  <p className="font-mono text-[9px] text-[#9e98b0] mt-0.5 tracking-wider uppercase">{transaction.category}</p>
+                                </div>
+                              </div>
+                              <div className="flex flex-col items-end">
+                                <p className={`font-semibold tracking-tight ${transaction.type === 'income' ? 'text-[#34d399]' : 'text-[#f87171]'}`}>
+                                  {transaction.type === 'income' ? '+' : '−'}₹{transaction.amount.toLocaleString('en-IN')}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* 3. Analytics Header & Carousel Start */}
+              <div className="block lg:hidden mt-2 mb-[-8px] px-1">
+                <div className="flex justify-between items-end">
+                  <h3 className="text-lg font-light tracking-wide text-[#f4f0e8]">Analytics Center</h3>
+                  <p className="font-mono text-[9px] uppercase tracking-widest text-[#5a5670] animate-pulse">Swipe →</p>
+                </div>
+              </div>
+
+              <div className="mobile-carousel lg:flex lg:flex-col lg:gap-8 w-full"></div>
 
               {/* Cashflow Visualization */}
               <div className="glass-card rounded-3xl p-8 min-h-[260px] flex flex-col relative overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl">
@@ -885,10 +928,46 @@ useEffect(() => {
                   <div className={`absolute inset-0 rounded-full blur-2xl opacity-20 ${healthScore.bg} pointer-events-none`} />
                 </div>
               </div>
-            </div>
 
-            {/* RIGHT COLUMN */}
-            <div className="lg:col-span-4 flex flex-col gap-8">
+              {/* 4. Spending Breakdown Donut (Mobile Only Clone inside Carousel) */}
+              <div className="block lg:hidden w-full h-full">
+                <div className="glass-card rounded-3xl p-6 flex flex-col min-h-[260px] h-full">
+                  <h3 className="text-lg font-light tracking-wide text-[#f4f0e8] mb-6">Breakdown</h3>
+                  <div className="flex items-center gap-6 mt-2 h-full">
+                    <div className="relative w-28 h-28 flex-shrink-0">
+                      <svg viewBox="0 0 42 42" className="w-full h-full -rotate-90 drop-shadow-2xl">
+                        <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="rgba(255,255,255,0.05)" strokeWidth="6" />
+                        {(() => {
+                          let cumulativePercent = 0;
+                          return expensesByCategory.map((exp, i) => {
+                            const percent = dashboardData.totalExpense > 0 ? (exp.value / dashboardData.totalExpense) * 100 : 0;
+                            const offset = -cumulativePercent;
+                            cumulativePercent += percent;
+                            return <circle key={exp.name} cx="21" cy="21" r="15.915" fill="transparent" stroke={pieColors[i % pieColors.length]} strokeWidth="6" strokeDasharray={animateCharts ? `${percent} 100` : `0 100`} strokeDashoffset={animateCharts ? offset : 0} className="transition-all duration-1000 ease-out" style={{ transitionDelay: `${i * 100}ms` }} />;
+                          });
+                        })()}
+                      </svg>
+                    </div>
+                    <div className="flex-1 flex flex-col gap-3 overflow-y-auto max-h-[120px] hide-scroll pr-2">
+                      {expensesByCategory.slice(0, 4).map((exp, i) => (
+                        <div key={exp.name} className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: pieColors[i % pieColors.length] }} />
+                            <span className="text-[12px] font-light text-[#e0dceb] truncate max-w-[60px]">{exp.name}</span>
+                          </div>
+                          <span className="font-mono text-[9px] text-[#5a5670] w-6 text-right">{((exp.value / dashboardData.totalExpense) * 100).toFixed(0)}%</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              </div> {/* <-- Closes mobile-carousel */}
+            </div> {/* <-- Closes lg:col-span-8 left column */}
+
+            {/* ─── RIGHT COLUMN / DESKTOP ONLY ─── */}
+            <div className="hidden lg:flex lg:col-span-4 flex-col gap-8">
 {/* Recent Transactions List */}
               <div className="glass-card rounded-3xl p-6 flex flex-col h-auto transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl mb-8">
                 <div className="flex justify-between items-center mb-6">
