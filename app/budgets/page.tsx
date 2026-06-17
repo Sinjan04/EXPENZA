@@ -59,17 +59,14 @@ const [budgets, setBudgets] = useState<any[]>([]);
     return map[cat] || "💳";
   };
 
-  const fetchBudgetData = async () => {
+const fetchBudgetData = async () => {
     setIsLoading(true);
     const token = localStorage.getItem("token");
-    if (!token) {
-      window.location.href = "/auth";
-      return;
-    }
+    
     // Fetch both budgets and transactions simultaneously
     const [budgetRes, txRes] = await Promise.all([
-      fetch("/api/budgets", { headers: { authorization: token } }),
-      fetch("/api/transactions", { headers: { authorization: token } })
+      fetch("/api/budgets", { headers: { authorization: token || "" } }),
+      fetch("/api/transactions", { headers: { authorization: token || "" } })
     ]);
 
     const budgetData = await budgetRes.json();
@@ -98,8 +95,24 @@ setBudgets(realBudgets);
     setTimeout(() => setIsLoading(false), 300);
   };
 
-  useEffect(() => {
-    fetchBudgetData();
+useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      fetchBudgetData();
+      return;
+    }
+
+    // Google session check fallback
+    fetch("/api/auth/session")
+      .then((res) => res.json())
+      .then((session) => {
+        if (session?.user) {
+          fetchBudgetData();
+        } else {
+          window.location.href = "/auth";
+        }
+      });
   }, []);
 
   // Derived Budget Metrics
