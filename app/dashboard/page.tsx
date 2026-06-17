@@ -722,7 +722,7 @@ useEffect(() => {
                 </div>
               </div>
 
-              {/* 3. Analytics Header & Carousel Start */}
+              {/*{/* 3. Analytics Header & Carousel Start */}
               <div className="block lg:hidden mt-2 mb-[-8px] px-1">
                 <div className="flex justify-between items-end">
                   <h3 className="text-lg font-light tracking-wide text-[#f4f0e8]">Analytics Center</h3>
@@ -730,7 +730,7 @@ useEffect(() => {
                 </div>
               </div>
 
-              <div className="mobile-carousel lg:flex lg:flex-col lg:gap-8 w-full"></div>
+              <div className="mobile-carousel lg:flex lg:flex-col lg:gap-8 w-full">
 
               {/* Cashflow Visualization */}
               <div className="glass-card rounded-3xl p-8 min-h-[260px] flex flex-col relative overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl">
