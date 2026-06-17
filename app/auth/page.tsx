@@ -10,8 +10,7 @@ export default function AuthPage() {
   const [password, setPassword] = useState("");
 const [loading, setLoading] = useState(false);
   const [fadeOut, setFadeOut] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showMobileSheet, setShowMobileSheet] = useState(false);
+const [showPassword, setShowPassword] = useState(false);
 
 const handleSubmit = async () => {
   setLoading(true);
@@ -131,87 +130,112 @@ const handleSubmit = async () => {
         }
 
         @media (max-width: 1024px) {
-          .auth-root { 
-            grid-template-columns: 1fr; 
-            overflow-y: auto; 
-            overflow-x: hidden; 
-            padding-bottom: 180px; /* Space for Pinned Bottom Bar */
-          }
-          
-          /* 1. Show the Hero Hub */
-          .left-panel { 
-            display: flex !important; 
-            padding: 8vh 24px;
-            align-items: center;
-            text-align: center;
-          }
-          .hero-sub { margin: 20px auto 0 auto; }
-          .stat-row { justify-content: center; }
-          .mobile-brand { display: block; margin-bottom: 24px; }
-          .center-divider { display: none; }
+  .auth-root {
+    grid-template-columns: 1fr;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    padding: 0;
+  }
 
-          /* 2. Hide Desktop form flow, convert to Bottom Sheet */
-          .right-panel { 
-            position: fixed;
-            inset: 0;
-            background: rgba(12, 13, 16, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            z-index: 50;
-            padding: 0;
-            align-items: flex-end;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-          }
-          .right-panel.sheet-open {
-            opacity: 1;
-            pointer-events: auto;
-          }
+  /* 1. Compact brand intro — short title only, no hero/stats takeover */
+  .left-panel {
+    display: flex !important;
+    position: relative;
+    padding: max(28px, env(safe-area-inset-top)) 24px 4px;
+    flex: 0 0 auto;
+    text-align: center;
+    justify-content: center;
+  }
+  .left-panel > div { width: 100%; }
+  .brand-tag { font-size: 22px; margin-bottom: 6px; }
+  .hero-headline { font-size: 22px; font-weight: 400; }
+  .hero-sub, .stat-row { display: none; }
+  .mobile-brand { display: none; }
+  .center-divider { display: none; }
 
-          .form-shell { 
-            width: 100%;
-            max-width: 100%;
-            margin: 0;
-            background: rgba(12, 13, 16, 0.95);
-            border-radius: 32px 32px 0 0;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-bottom: none;
-            padding: 32px 24px max(40px, env(safe-area-inset-bottom)) 24px;
-            box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.5);
-            transform: translateY(100%);
-            transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
-            position: relative;
-          }
-          .right-panel.sheet-open .form-shell {
-            transform: translateY(0);
-          }
-          
-/* 3. Push background cards out of reading zone */
-          .txn-card-1 { 
-            top: 2%; 
-            left: -25%; 
-            transform: scale(0.45); 
-            opacity: 0.12; 
-            filter: blur(3px);
-          }
-          .txn-card-3 { 
-            top: auto; 
-            bottom: 25%; 
-            right: -30%; 
-            transform: scale(0.45); 
-            opacity: 0.12; 
-            filter: blur(3px);
-          }
-          .txn-card-4 { display: none; }
-          .hide-on-mobile { display: none; }
-          .terminal-header { align-items: center; justify-content: center; text-align: center; }
-          
-          /* Larger Touch Targets */
-          .field-input { padding: 15px 16px; }
-          .submit-btn { padding: 18px; font-size: 14px; margin-top: 14px; }
-          .form-title { font-size: clamp(28px, 8vw, 36px); margin-bottom: 8px; }
-        }
+  /* 2. Form flows statically in-page — no fixed sheet, no overlay, no drag */
+  .right-panel {
+    position: relative;
+    inset: auto;
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    z-index: 10;
+    padding: 12px 20px max(28px, env(safe-area-inset-bottom));
+    align-items: stretch;
+    opacity: 1;
+    pointer-events: auto;
+    flex: 1 1 auto;
+  }
+  .right-panel .absolute.inset-0 { display: none; }
+
+  .form-shell {
+    width: 100%;
+    max-width: 440px;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 24px 20px max(24px, env(safe-area-inset-bottom));
+    box-shadow: 0 4px 28px rgba(0, 0, 0, 0.35);
+    transform: none;
+    position: relative;
+  }
+
+  /* 3. Push background cards out of reading zone */
+  .txn-card-1 {
+    top: 2%;
+    left: -25%;
+    transform: scale(0.45);
+    opacity: 0.12;
+    filter: blur(3px);
+  }
+  .txn-card-3 {
+    top: auto;
+    bottom: 25%;
+    right: -30%;
+    transform: scale(0.45);
+    opacity: 0.12;
+    filter: blur(3px);
+  }
+  .txn-card-4 { display: none; }
+  .hide-on-mobile { display: none; }
+  .terminal-header { align-items: center; justify-content: center; text-align: center; }
+
+  /* Larger touch targets */
+  .field-input { padding: 15px 16px; }
+  .submit-btn { padding: 18px; font-size: 14px; margin-top: 14px; }
+  .form-title { font-size: clamp(24px, 7vw, 30px); margin-bottom: 8px; }
+
+  /* Show the in-form Google button + divider on mobile too, as a circular icon row */
+  .google-btn { display: none; }
+  .auth-divider { display: flex !important; }
+  .mobile-google-row { display: flex !important; }
+}
+
+/* Circular Google icon button, reference-style — mobile only */
+.mobile-google-row {
+  display: none;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+.mobile-google-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.mobile-google-circle:active { transform: scale(0.95); background: rgba(255,255,255,0.08); }
+.mobile-google-circle svg { width: 20px; height: 20px; }
 
 /* ── ANIMATED BACKGROUND LAYER ── */
         .bg-stage {
@@ -864,13 +888,8 @@ transform: translateY(-8px);
         </div>
 
 {/* ── RIGHT PANEL (Desktop Form / Mobile Sheet) ── */}
-        <div className={`right-panel ${showMobileSheet ? 'sheet-open' : ''}`}>
-          {/* Mobile Overlay Click to Close */}
-          <div className="absolute inset-0 block lg:hidden" onClick={() => setShowMobileSheet(false)} />
-
+<div className="right-panel">
           <div className="form-shell">
-            {/* Mobile Drag Pill */}
-            <div className="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-6 block lg:hidden" />
 
             {/* Form badge */}
             <div className="terminal-header">
@@ -910,10 +929,10 @@ transform: translateY(-8px);
             </div>
 
             {/* Premium Google Button (Hidden on Mobile) */}
-            <button
+<button
               type="button"
               onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
-              className="google-btn hidden lg:flex"
+              className="google-btn"
             >
               <svg className="google-icon" viewBox="0 0 24 24">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -924,8 +943,25 @@ transform: translateY(-8px);
               Continue with Google
             </button>
 
-            <div className="auth-divider hidden lg:flex">
+            <div className="auth-divider">
               <span>Or continue with email</span>
+            </div>
+
+            {/* Mobile-only circular Google button (reference-style icon row, Google only) */}
+            <div className="mobile-google-row">
+              <button
+                type="button"
+                onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
+                className="mobile-google-circle"
+                aria-label="Continue with Google"
+              >
+                <svg viewBox="0 0 24 24">
+                  <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+                  <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+                  <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
+                  <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+                </svg>
+              </button>
             </div>
 
             {/* Fields */}
@@ -1015,34 +1051,7 @@ transform: translateY(-8px);
           </div>
         </div>
 
-{/* ── MOBILE PINNED ACTION BAR ── */}
-        <div 
-          className="block lg:hidden fixed bottom-0 left-0 right-0 px-6 pt-12 bg-gradient-to-t from-[#0c0d10] via-[#0c0d10]/95 to-transparent z-40"
-          style={{ paddingBottom: 'max(24px, env(safe-area-inset-bottom))' }}
-        >
-          <button
-            type="button"
-            onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
-            className="flex items-center justify-center gap-3 w-full bg-[#f4f0e8] text-[#0c0d10] font-semibold rounded-2xl py-4 text-[14px] shadow-[0_8px_24px_rgba(255,255,255,0.15)] active:scale-95 transition-transform"
-          >
-            <svg className="w-5 h-5" viewBox="0 0 24 24">
-              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
-              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
-              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
-              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
-            </svg>
-            Continue with Google
-          </button>
-          
-          <button
-            onClick={() => setShowMobileSheet(true)}
-            className="w-full mt-4 text-[#9e98b0] text-[13px] font-medium tracking-wide pb-2 active:text-white transition-colors"
-          >
-            Or sign in with email
-          </button>
-        </div>
-
-      </main>
+</main>
     </>
   );
 }
