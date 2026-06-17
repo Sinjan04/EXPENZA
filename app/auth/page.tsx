@@ -187,11 +187,23 @@ const handleSubmit = async () => {
             transform: translateY(0);
           }
           
-          /* 3. Re-frame background cards to float around the text */
-          .txn-card-1 { top: 12%; left: -10%; transform: scale(0.65); opacity: 0.5; }
-          .txn-card-3 { top: auto; bottom: 30%; right: -15%; transform: scale(0.65); opacity: 0.5; }
+/* 3. Push background cards out of reading zone */
+          .txn-card-1 { 
+            top: 2%; 
+            left: -25%; 
+            transform: scale(0.45); 
+            opacity: 0.12; 
+            filter: blur(3px);
+          }
+          .txn-card-3 { 
+            top: auto; 
+            bottom: 25%; 
+            right: -30%; 
+            transform: scale(0.45); 
+            opacity: 0.12; 
+            filter: blur(3px);
+          }
           .txn-card-4 { display: none; }
-
           .hide-on-mobile { display: none; }
           .terminal-header { align-items: center; justify-content: center; text-align: center; }
           
@@ -659,6 +671,9 @@ const handleSubmit = async () => {
         .submit-btn:active { transform: translateY(0) scale(0.99); box-shadow: 0 2px 12px rgba(240,192,64,0.25); }
 
         /* Google Button & Divider */
+        @media (max-width: 1024px) {
+          .desktop-only { display: none !important; }
+        }
         .google-btn {
           display: flex;
           align-items: center;
@@ -1000,8 +1015,11 @@ transform: translateY(-8px);
           </div>
         </div>
 
-        {/* ── MOBILE PINNED ACTION BAR ── */}
-        <div className="block lg:hidden fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-[#0c0d10] via-[#0c0d10]/90 to-transparent z-40 pb-safe">
+{/* ── MOBILE PINNED ACTION BAR ── */}
+        <div 
+          className="block lg:hidden fixed bottom-0 left-0 right-0 px-6 pt-12 bg-gradient-to-t from-[#0c0d10] via-[#0c0d10]/95 to-transparent z-40"
+          style={{ paddingBottom: 'max(24px, env(safe-area-inset-bottom))' }}
+        >
           <button
             type="button"
             onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
