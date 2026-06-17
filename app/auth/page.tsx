@@ -203,6 +203,10 @@ const handleSubmit = async () => {
   .auth-divider.desktop-only { display: none !important; }
   .auth-divider.mobile-only-divider { display: flex !important; margin-top: 24px; }
   .mobile-google-row { display: flex !important; }
+
+  /* Force-hide stat row (2.4Cr / 98% / 24/7 cards) on mobile */
+  .stat-row { display: none !important; }
+}
 }
 
 @media (min-width: 1025px) {
