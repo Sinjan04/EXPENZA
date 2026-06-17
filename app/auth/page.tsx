@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import { signIn } from "next-auth/react";
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -785,6 +786,14 @@ transform: translateY(-8px);
                 Register
               </button>
             </div>
+            <button
+  onClick={() => signIn("google", {
+    callbackUrl: "/dashboard",
+  })}
+  className="w-full mt-4 rounded-xl border border-white/10 py-4"
+>
+  Continue with Google
+</button>
 
 {/* Heading */}
             <div className="form-title">

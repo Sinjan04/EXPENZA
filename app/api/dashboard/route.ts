@@ -1,48 +1,63 @@
 import { NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
+import jwt from "jsonwebtoken";
+import { authOptions } from "@/lib/auth";
 
 export async function GET(req: Request) {
-const authHeader = req.headers.get("authorization");
+  const session = await getServerSession(authOptions);
+  let userId: string | null = null;
 
-if (!authHeader) {
-  return NextResponse.json(
-    { error: "No token provided" },
-    { status: 401 }
-  );
-}
+  // Hybrid Auth Check
+  if (session?.user) {
+    userId = (session.user as any).userId;
+  } else {
+    const token = req.headers.get("authorization");
+    if (token) {
+      try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string };
+        userId = decoded.userId;
+      } catch (e) {
+        // Invalid token
+      }
+    }
+  }
 
-const token = authHeader.replace("Bearer ", "");
+  if (!userId) {
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    );
+  }
 
-const decoded = jwt.verify(
-  token,
-  process.env.JWT_SECRET!
-);
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+  });
 
-  const userData = decoded as {
-    userId: string;
-    email: string;
-  };
+  if (!user) {
+    return NextResponse.json(
+      { error: "User not found" },
+      { status: 404 }
+    );
+  }
 
   const transactions = await prisma.transaction.findMany({
     where: {
-      userId: userData.userId,
+      userId: user.id,
     },
   });
 
   const totalIncome = transactions
-  .filter((t) => t.type === "income")
-  .reduce((sum, t) => sum + t.amount, 0);
+    .filter((t) => t.type === "income")
+    .reduce((sum, t) => sum + t.amount, 0);
 
-const totalExpense = transactions
-  .filter((t) => t.type === "expense")
-  .reduce((sum, t) => sum + t.amount, 0);
+  const totalExpense = transactions
+    .filter((t) => t.type === "expense")
+    .reduce((sum, t) => sum + t.amount, 0);
 
-const balance = totalIncome - totalExpense;
-
-return NextResponse.json({
-  totalIncome,
-  totalExpense,
-  balance,
-});
+  return NextResponse.json({
+    totalIncome,
+    totalExpense,
+    balance: totalIncome - totalExpense,
+  });
 }

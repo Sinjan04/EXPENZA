@@ -128,9 +128,20 @@ const [showInsights, setShowInsights] = useState(false);
       },
     });
 
-    const data = await response.json();
+const data = await response.json();
 
-    setDashboardData(data);
+console.log("Dashboard API Response:", data);
+
+if (!data.error) {
+  setDashboardData(data);
+} else {
+  console.error("Dashboard Error:", data);
+  setDashboardData({
+    balance: 0,
+    totalIncome: 0,
+    totalExpense: 0,
+  });
+}
     const transactionResponse = await fetch("/api/transactions", {
       headers: {
         authorization: token || "",
@@ -139,26 +150,41 @@ const [showInsights, setShowInsights] = useState(false);
 
     const transactionData = await transactionResponse.json();
 
-    setTransactions(transactionData);
-    
+console.log("Transactions API Response:", transactionData);
+
+if (Array.isArray(transactionData)) {
+  setTransactions(transactionData);
+} else {
+  console.error("Transactions is not an array:", transactionData);
+  setTransactions([]);
+}
+
 // Trigger chart fill animations slightly after data binds
-    setTimeout(() => setAnimateCharts(true), 10);
-    
-    // Add a tiny artificial delay to let the skeleton animation breathe, 
-    // mimicking a high-end data compile.
-    setTimeout(() => setIsLoading(false), 300);
+setTimeout(() => setAnimateCharts(true), 10);
+
+// Add a tiny artificial delay to let the skeleton animation breathe,
+setTimeout(() => setIsLoading(false), 300);
   };
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
+useEffect(() => {
+  const token = localStorage.getItem("token");
 
-    if (!token) {
-      window.location.href = "/auth";
-      return;
-    }
-
+  if (token) {
     fetchDashboard();
-  }, []);
+    return;
+  }
+
+  // Google session check
+  fetch("/api/auth/session")
+    .then((res) => res.json())
+    .then((session) => {
+      if (session?.user) {
+        fetchDashboard();
+      } else {
+        window.location.href = "/auth";
+      }
+    });
+}, []);
 
   const handleDeleteTransaction = async (transactionId: string) => {
     const token = localStorage.getItem("token");
@@ -243,7 +269,11 @@ const [showInsights, setShowInsights] = useState(false);
 
   // Derive insights and chart data purely from existing state
   const expensesByCategory = useMemo(() => {
-    const expenses = transactions.filter(t => t.type === 'expense');
+  if (!Array.isArray(transactions)) return [];
+
+  const expenses = transactions.filter(
+    (t) => t.type === "expense"
+  );
     const grouped = expenses.reduce((acc, curr) => {
       acc[curr.category] = (acc[curr.category] || 0) + curr.amount;
       return acc;

@@ -8,15 +8,15 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  name      String
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
+  id           String        @id @default(cuid())
+  name         String
+  email        String        @unique
+  password     String
+  createdAt    DateTime      @default(now())
+  budgets      Budget[]
+  transactions Transaction[]
+}
 
-   transactions Transaction[]
-budgets      Budget[]
-} 
 model Transaction {
   id        String   @id @default(cuid())
   amount    Float
@@ -24,18 +24,15 @@ model Transaction {
   category  String
   note      String?
   createdAt DateTime @default(now())
-
   userId    String
-  user      User @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 }
+
 model Budget {
   id        String   @id @default(cuid())
-
   category  String
   limit     Float
-
   createdAt DateTime @default(now())
-
   userId    String
-  user      User @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 }

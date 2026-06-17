@@ -1,26 +1,34 @@
 import { NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
+import jwt from "jsonwebtoken";
+import { authOptions } from "@/lib/auth";
 
 export async function POST(req: Request) {
-  const token = req.headers.get("authorization");
+  const session = await getServerSession(authOptions);
+  let userId: string | null = null;
 
-  if (!token) {
+  // Hybrid Auth Check
+  if (session?.user) {
+    userId = (session.user as any).userId;
+  } else {
+    const token = req.headers.get("authorization");
+    if (token) {
+      try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string };
+        userId = decoded.userId;
+      } catch (e) {
+        // Invalid token
+      }
+    }
+  }
+
+  if (!userId) {
     return NextResponse.json(
-      { error: "No token provided" },
+      { error: "Unauthorized" },
       { status: 401 }
     );
   }
-
-  const decoded = jwt.verify(
-    token,
-    process.env.JWT_SECRET!
-  );
-
-const userData = decoded as {
-  userId: string;
-  email: string;
-};
 const body = await req.json();
 if (body.amount <= 0) {
   return NextResponse.json(
@@ -52,59 +60,71 @@ const transaction = await prisma.transaction.create({
     type: body.type,
     category: body.category,
     note: body.note,
-    userId: userData.userId,
+    userId: userId,
   },
 });
 
 return NextResponse.json(transaction);
 }
 export async function GET(req: Request) {
-  const token = req.headers.get("authorization");
+  const session = await getServerSession(authOptions);
+  let userId: string | null = null;
 
-  if (!token) {
+  // Hybrid Auth Check
+  if (session?.user) {
+    userId = (session.user as any).userId;
+  } else {
+    const token = req.headers.get("authorization");
+    if (token) {
+      try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string };
+        userId = decoded.userId;
+      } catch (e) {
+        // Invalid token
+      }
+    }
+  }
+
+  if (!userId) {
     return NextResponse.json(
-      { error: "No token provided" },
+      { error: "Unauthorized" },
       { status: 401 }
     );
   }
 
-  const decoded = jwt.verify(
-    token,
-    process.env.JWT_SECRET!
-  );
-
-  const userData = decoded as {
-    userId: string;
-    email: string;
-  };
-
   const transactions = await prisma.transaction.findMany({
     where: {
-      userId: userData.userId,
+      userId: userId,
     },
   });
 
   return NextResponse.json(transactions);
 }
 export async function DELETE(req: Request) {
-  const token = req.headers.get("authorization");
+  const session = await getServerSession(authOptions);
+  let userId: string | null = null;
 
-  if (!token) {
+  // Hybrid Auth Check
+  if (session?.user) {
+    userId = (session.user as any).userId;
+  } else {
+    const token = req.headers.get("authorization");
+    if (token) {
+      try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string };
+        userId = decoded.userId;
+      } catch (e) {
+        // Invalid token
+      }
+    }
+  }
+
+  if (!userId) {
     return NextResponse.json(
-      { error: "No token provided" },
+      { error: "Unauthorized" },
       { status: 401 }
     );
   }
-
-  const decoded = jwt.verify(
-    token,
-    process.env.JWT_SECRET!
-  );
-
-  const userData = decoded as {
-    userId: string;
-    email: string;
-  };
 
   const { searchParams } = new URL(req.url);
 
@@ -132,8 +152,8 @@ export async function DELETE(req: Request) {
     );
   }
 
-  if (
-    transaction.userId !== userData.userId
+if (
+    transaction.userId !== userId
   ) {
     return NextResponse.json(
       { error: "Unauthorized" },
