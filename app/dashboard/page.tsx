@@ -50,7 +50,8 @@ const [animateCharts, setAnimateCharts] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 const [showInsights, setShowInsights] = useState(false);
   const [showHealthDetails, setShowHealthDetails] = useState(false);
-  const [transactionError, setTransactionError] = useState("");
+const [transactionError, setTransactionError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
 // Retention System State
   const [showReminder, setShowReminder] = useState(false);
@@ -200,47 +201,58 @@ useEffect(() => {
   };
 
   const handleAddTransaction = async () => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
     setTransactionError("");
     const numAmount = Number(amount);
     
     if (!amount || numAmount <= 0) {
       setTransactionError("Amount must be greater than ₹0.");
+      setIsSubmitting(false);
       return;
     }
     if (!category) {
       setTransactionError("Please select a category.");
+      setIsSubmitting(false);
       return;
     }
 
-    const token = localStorage.getItem("token");
+    try {
+      const token = localStorage.getItem("token");
 
-    const response = await fetch("/api/transactions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        authorization: token || "",
-      },
-      body: JSON.stringify({
-        amount: numAmount,
-        type,
-        category,
-        note,
-      }),
-    });
+      const response = await fetch("/api/transactions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: token || "",
+        },
+        body: JSON.stringify({
+          amount: numAmount,
+          type,
+          category,
+          note,
+        }),
+      });
 
-    if (!response.ok) {
-      const errData = await response.json();
-      setTransactionError(errData.error || "Failed to save transaction.");
-      return;
+      if (!response.ok) {
+        const errData = await response.json();
+        setTransactionError(errData.error || "Failed to save transaction.");
+        setIsSubmitting(false);
+        return;
+      }
+
+      await fetchDashboard();
+
+      setShowModal(false);
+      setAmount("");
+      setCategory("");
+      setNote("");
+      setType("expense");
+    } catch (err) {
+      setTransactionError("A network error occurred.");
+    } finally {
+      setIsSubmitting(false);
     }
-
-    await fetchDashboard();
-
-    setShowModal(false);
-    setAmount("");
-    setCategory("");
-    setNote("");
-    setType("expense");
   };
   const getCategoryEmoji = (cat: string) => {
     const map: Record<string, string> = {
@@ -685,16 +697,16 @@ useEffect(() => {
                 </div>
 
                 <div className="grid grid-cols-3 gap-3">
-                  <div className="glass-card rounded-2xl p-4 text-center group transition-all hover:bg-white/[0.04]">
-                    <p className="font-mono text-[9px] uppercase tracking-widest text-[#5a5670] mb-1">Income</p>
+                  <div className="bg-[#0d2118] border border-[#34d399]/20 rounded-2xl p-4 text-center group transition-all">
+                    <p className="font-mono text-[9px] uppercase tracking-widest text-[#34d399] mb-1 opacity-80">Income</p>
                     <p className="text-[12px] sm:text-[14px] font-semibold text-[#34d399] tracking-tight truncate">₹{dashboardData.totalIncome.toLocaleString('en-IN')}</p>
                   </div>
-                  <div className="glass-card rounded-2xl p-4 text-center group transition-all hover:bg-white/[0.04]">
-                    <p className="font-mono text-[9px] uppercase tracking-widest text-[#5a5670] mb-1">Expense</p>
+                  <div className="bg-[#261012] border border-[#f87171]/20 rounded-2xl p-4 text-center group transition-all">
+                    <p className="font-mono text-[9px] uppercase tracking-widest text-[#f87171] mb-1 opacity-80">Expense</p>
                     <p className="text-[12px] sm:text-[14px] font-semibold text-[#f87171] tracking-tight truncate">₹{dashboardData.totalExpense.toLocaleString('en-IN')}</p>
                   </div>
-                  <div className="glass-card rounded-2xl p-4 text-center group transition-all hover:bg-white/[0.04]">
-                    <p className="font-mono text-[9px] uppercase tracking-widest text-[#5a5670] mb-1">Saved</p>
+                  <div className="bg-[#0e1726] border border-[#3b82f6]/20 rounded-2xl p-4 text-center group transition-all">
+                    <p className="font-mono text-[9px] uppercase tracking-widest text-[#3b82f6] mb-1 opacity-80">Saved</p>
                     <p className="text-[12px] sm:text-[14px] font-semibold text-[#3b82f6] tracking-tight truncate">₹{savings.toLocaleString('en-IN')}</p>
                   </div>
                 </div>
@@ -722,10 +734,11 @@ useEffect(() => {
                                   <p className="font-mono text-[9px] text-[#9e98b0] mt-0.5 tracking-wider uppercase">{transaction.category}</p>
                                 </div>
                               </div>
-                              <div className="flex flex-col items-end">
+<div className="flex flex-col items-end gap-1">
                                 <p className={`font-semibold tracking-tight ${transaction.type === 'income' ? 'text-[#34d399]' : 'text-[#f87171]'}`}>
                                   {transaction.type === 'income' ? '+' : '−'}₹{transaction.amount.toLocaleString('en-IN')}
                                 </p>
+                                <button onClick={() => handleDeleteTransaction(transaction.id)} className="text-[10px] font-mono tracking-widest uppercase text-[#f87171] opacity-70 hover:opacity-100 py-1">Delete</button>
                               </div>
                             </div>
                           ))}
@@ -815,69 +828,69 @@ useEffect(() => {
                   </span>
                 </div>
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 relative z-10">
-                  {/* Insight 1: Highest Expense */}
-                  <div className="flex items-center gap-4 p-4 rounded-2xl bg-white/[0.02] border border-white/[0.04] transition-all duration-300 hover:bg-white/[0.05] hover:-translate-y-[2px] hover:shadow-[0_8px_24px_rgba(0,0,0,0.25)]">
-                    {highestExpense ? (
-                      <>
-                        <div className="w-10 h-10 rounded-full bg-[#f87171]/10 flex items-center justify-center text-[#f87171] flex-shrink-0">
+                      {/* Insight 1: Highest Expense */}
+                      <div className="flex items-center gap-4 p-4 rounded-2xl bg-[#261012] border border-[#f87171]/20 transition-all duration-300 hover:-translate-y-[2px] hover:shadow-[0_8px_24px_rgba(248,113,113,0.15)]">
+                        {highestExpense ? (
+                          <>
+                            <div className="w-10 h-10 rounded-full bg-[#f87171]/10 flex items-center justify-center text-[#f87171] flex-shrink-0">
+                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                              </svg>
+                            </div>
+                            <div>
+                              <p className="text-sm font-light text-[#f87171]">
+                                Highest spend is <strong className="font-semibold text-[#f87171]">{highestExpense.name}</strong> at <strong className="font-semibold">₹{highestExpense.value.toLocaleString('en-IN')}</strong>.
+                              </p>
+                              <p className="font-mono text-[10px] text-[#f87171] opacity-70 mt-1 tracking-widest uppercase">
+                                {((highestExpense.value / dashboardData.totalExpense) * 100).toFixed(1)}% of expenses
+                              </p>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="w-10 h-10 rounded-full bg-[#f87171]/10 flex items-center justify-center text-[#f87171] flex-shrink-0">
+                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M3 3v18h18"/>
+                                <path d="m19 9-5 5-4-4-3 3"/>
+                              </svg>
+                            </div>
+                            <div>
+                              <p className="text-sm font-light text-[#f87171] opacity-70">Awaiting transaction data.</p>
+                              <p className="font-mono text-[10px] text-[#f87171] opacity-50 mt-1 tracking-widest uppercase">Gathering insights</p>
+                            </div>
+                          </>
+                        )}
+                      </div>
+
+                      {/* Insight 2: Daily Velocity */}
+                      <div className="flex items-center gap-4 p-4 rounded-2xl bg-[#241d0b] border border-[#f0c040]/20 transition-all duration-300 hover:-translate-y-[2px] hover:shadow-[0_8px_24px_rgba(240,192,64,0.15)]">
+                        <div className="w-10 h-10 rounded-full bg-[#f0c040]/10 flex items-center justify-center text-[#f0c040] flex-shrink-0 shadow-[inset_0_0_12px_rgba(240,192,64,0.2)]">
                           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
                           </svg>
                         </div>
                         <div>
-                          <p className="text-sm font-light text-[#e0dceb]">
-                            Highest spend is <strong className="font-semibold text-[#f87171]">{highestExpense.name}</strong> at <strong className="font-semibold text-[#f4f0e8]">₹{highestExpense.value.toLocaleString('en-IN')}</strong>.
-                          </p>
-                          <p className="font-mono text-[10px] text-[#5a5670] mt-1 tracking-widest uppercase">
-                            {((highestExpense.value / dashboardData.totalExpense) * 100).toFixed(1)}% of expenses
-                          </p>
+                          {dailyVelocity > 0 ? (
+                            <>
+                              <p className="text-sm font-light text-[#f0c040]">
+                                Burning <strong className="font-semibold text-[#f0c040]">₹{Math.round(dailyVelocity).toLocaleString('en-IN')}/day</strong>. Runway is <strong className="font-semibold">{runwayDays} days</strong>.
+                              </p>
+                              <p className="font-mono text-[10px] text-[#f0c040] opacity-70 mt-1 tracking-widest uppercase">
+                                Month-to-date average
+                              </p>
+                            </>
+                          ) : (
+                            <>
+                              <p className="text-sm font-light text-[#f0c040] opacity-70">No spend velocity detected.</p>
+                              <p className="font-mono text-[10px] text-[#f0c040] opacity-50 mt-1 tracking-widest uppercase">
+                                Looking good
+                              </p>
+                            </>
+                          )}
                         </div>
-                      </>
-                    ) : (
-                      <>
-                        <div className="w-10 h-10 rounded-full bg-[#34d399]/10 flex items-center justify-center text-[#34d399] flex-shrink-0">
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M3 3v18h18"/>
-                            <path d="m19 9-5 5-4-4-3 3"/>
-                          </svg>
-                        </div>
-                        <div>
-                          <p className="text-sm font-light text-[#e0dceb]">Awaiting transaction data.</p>
-                          <p className="font-mono text-[10px] text-[#5a5670] mt-1 tracking-widest uppercase">Gathering insights</p>
-                        </div>
-                      </>
-                    )}
-                  </div>
+                      </div>
 
-                  {/* Insight 2: Daily Velocity */}
-                  <div className="flex items-center gap-4 p-4 rounded-2xl bg-white/[0.02] border border-white/[0.04] transition-all duration-300 hover:bg-white/[0.05] hover:-translate-y-[2px] hover:shadow-[0_8px_24px_rgba(0,0,0,0.25)]">
-                    <div className="w-10 h-10 rounded-full bg-[#f0c040]/10 flex items-center justify-center text-[#f0c040] flex-shrink-0 shadow-[inset_0_0_12px_rgba(240,192,64,0.2)]">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-                      </svg>
                     </div>
-<div>
-                      {dailyVelocity > 0 ? (
-                        <>
-                          <p className="text-sm font-light text-[#e0dceb]">
-                            Burning <strong className="font-semibold text-[#f0c040]">₹{Math.round(dailyVelocity).toLocaleString('en-IN')}/day</strong>. Runway is <strong className="font-semibold text-[#f4f0e8]">{runwayDays} days</strong>.
-                          </p>
-                          <p className="font-mono text-[10px] text-[#5a5670] mt-1 tracking-widest uppercase">
-                            Month-to-date average
-                          </p>
-                        </>
-                      ) : (
-                        <>
-                          <p className="text-sm font-light text-[#e0dceb]">No spend velocity detected.</p>
-                          <p className="font-mono text-[10px] text-[#5a5670] mt-1 tracking-widest uppercase">
-                            Looking good
-                          </p>
-                        </>
-                      )}
-                    </div>
-                  </div>
-
-                </div>
               </div>
 
 {/* Financial Health Score */}
@@ -1268,32 +1281,32 @@ useEffect(() => {
               <div className="flex-1 overflow-y-auto hide-scroll pr-2 space-y-8">
                 
 {/* 3-Grid Top Metrics */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="rounded-2xl bg-white/[0.015] border border-white/[0.04] p-6 relative overflow-hidden transition-all duration-300 hover:bg-white/[0.03] hover:-translate-y-[2px] hover:shadow-[0_8px_24px_rgba(0,0,0,0.25)]">
-                    <p className="font-mono text-[10px] text-[#5a5670] uppercase tracking-widest mb-4">Savings Rate</p>
+               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="rounded-2xl bg-[#0d2118] border border-[#34d399]/20 p-6 relative overflow-hidden transition-all duration-300 hover:-translate-y-[2px] hover:shadow-[0_8px_24px_rgba(52,211,153,0.15)]">
+                    <p className="font-mono text-[10px] text-[#34d399] opacity-80 uppercase tracking-widest mb-4">Savings Rate</p>
                     <div className="text-4xl font-light text-[#34d399]">
                       {dashboardData.totalIncome > 0 ? ((savings / dashboardData.totalIncome) * 100).toFixed(1) : 0}%
                     </div>
-                    <p className="text-xs font-light text-[#9e98b0] mt-2">Of total income retained</p>
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#34d399]/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/3" />
+                    <p className="text-xs font-light text-[#34d399] opacity-70 mt-2">Of total income retained</p>
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#34d399]/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/3" />
                   </div>
 
-                  <div className="rounded-2xl bg-white/[0.015] border border-white/[0.04] p-6 relative overflow-hidden transition-all duration-300 hover:bg-white/[0.03] hover:-translate-y-[2px] hover:shadow-[0_8px_24px_rgba(0,0,0,0.25)]">
-                    <p className="font-mono text-[10px] text-[#5a5670] uppercase tracking-widest mb-4">Daily Burn</p>
+                  <div className="rounded-2xl bg-[#261012] border border-[#f87171]/20 p-6 relative overflow-hidden transition-all duration-300 hover:-translate-y-[2px] hover:shadow-[0_8px_24px_rgba(248,113,113,0.15)]">
+                    <p className="font-mono text-[10px] text-[#f87171] opacity-80 uppercase tracking-widest mb-4">Daily Burn</p>
                     <div className="text-4xl font-light text-[#f87171]">
                       ₹{Math.round(dashboardData.totalExpense / new Date().getDate()).toLocaleString('en-IN')}
                     </div>
-                    <p className="text-xs font-light text-[#9e98b0] mt-2">Average spent per day</p>
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#f87171]/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/3" />
+                    <p className="text-xs font-light text-[#f87171] opacity-70 mt-2">Average spent per day</p>
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#f87171]/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/3" />
                   </div>
 
-                  <div className="rounded-2xl bg-white/[0.015] border border-white/[0.04] p-6 relative overflow-hidden transition-all duration-300 hover:bg-white/[0.03] hover:-translate-y-[2px] hover:shadow-[0_8px_24px_rgba(0,0,0,0.25)]">
-                    <p className="font-mono text-[10px] text-[#5a5670] uppercase tracking-widest mb-4">Top Outflow</p>
+                  <div className="rounded-2xl bg-[#241d0b] border border-[#f0c040]/20 p-6 relative overflow-hidden transition-all duration-300 hover:-translate-y-[2px] hover:shadow-[0_8px_24px_rgba(240,192,64,0.15)]">
+                    <p className="font-mono text-[10px] text-[#f0c040] opacity-80 uppercase tracking-widest mb-4">Top Outflow</p>
                     <div className="text-4xl font-light text-[#f0c040] truncate">
                       {highestExpense ? highestExpense.name : '-'}
                     </div>
-                    <p className="text-xs font-light text-[#9e98b0] mt-2">Highest cash drain</p>
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#f0c040]/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/3" />
+                    <p className="text-xs font-light text-[#f0c040] opacity-70 mt-2">Highest cash drain</p>
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#f0c040]/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/3" />
                   </div>
                 </div>
                 {/* Top 5 Categories Breakdown */}
@@ -1441,11 +1454,19 @@ useEffect(() => {
                 >
                   Cancel
                 </button>
-                <button
+<button
                   onClick={handleAddTransaction}
-                  className="flex-1 rounded-xl btn-gold py-4 text-[13px] font-semibold text-black"
+                  disabled={isSubmitting}
+                  className="flex-1 rounded-xl btn-gold py-4 text-[13px] font-semibold text-black flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                 >
-                  Save Entry
+                  {isSubmitting ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    "Save Entry"
+                  )}
                 </button>
               </div>
             </div>
