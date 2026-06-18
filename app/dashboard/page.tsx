@@ -46,12 +46,21 @@ export default function DashboardPage() {
   const [type, setType] = useState("expense");
   const [category, setCategory] = useState("");
   const [note, setNote] = useState("");
+const [transactionDate, setTransactionDate] = useState("");
 const [animateCharts, setAnimateCharts] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 const [showInsights, setShowInsights] = useState(false);
   const [showHealthDetails, setShowHealthDetails] = useState(false);
 const [transactionError, setTransactionError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [undoToast, setUndoToast] = useState<{ show: boolean; tx: any }>({ show: false, tx: null });
+  const [lastDeleted, setLastDeleted] = useState<any>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editTransaction, setEditTransaction] = useState<any>(null);
+  const [editAmount, setEditAmount] = useState("");
+  const [editNote, setEditNote] = useState("");
+  const [editDate, setEditDate] = useState("");
   
 // Retention System State
   const [showReminder, setShowReminder] = useState(false);
@@ -206,6 +215,9 @@ useEffect(() => {
 }, []);
 
   const handleDeleteTransaction = async (transactionId: string) => {
+    const tx = transactions.find((t) => t.id === transactionId);
+    if (!tx) return;
+
     const token = localStorage.getItem("token");
 
     await fetch(`/api/transactions?id=${transactionId}`, {
@@ -215,6 +227,79 @@ useEffect(() => {
       },
     });
 
+    setLastDeleted(tx);
+    setUndoToast({ show: true, tx });
+    setTimeout(() => setUndoToast({ show: false, tx: null }), 5000);
+
+    await fetchDashboard();
+  };
+
+  const handleUndoDelete = async () => {
+    if (!lastDeleted) return;
+    const token = localStorage.getItem("token");
+
+    await fetch("/api/transactions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        authorization: token || "",
+      },
+      body: JSON.stringify({
+        amount: lastDeleted.amount,
+        type: lastDeleted.type,
+        category: lastDeleted.category,
+        note: lastDeleted.note,
+        createdAt: lastDeleted.createdAt,
+      }),
+    });
+
+    setUndoToast({ show: false, tx: null });
+    setLastDeleted(null);
+    await fetchDashboard();
+  };
+
+  const openEditModal = (tx: any) => {
+    setEditTransaction(tx);
+    setEditAmount(tx.amount.toString());
+    setEditNote(tx.note || "");
+    setEditDate(tx.createdAt ? new Date(tx.createdAt).toISOString().split('T')[0] : "");
+    setShowEditModal(true);
+  };
+
+  const handleEditTransaction = async () => {
+    if (!editTransaction) return;
+    const numAmount = Number(editAmount);
+    if (!editAmount || numAmount <= 0) {
+      setTransactionError("Amount must be greater than ₹0.");
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+    const response = await fetch(`/api/transactions?id=${editTransaction.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        authorization: token || "",
+      },
+      body: JSON.stringify({
+        amount: numAmount,
+        note: editNote,
+        createdAt: editDate ? new Date(editDate).toISOString() : editTransaction.createdAt,
+      }),
+    });
+
+    if (!response.ok) {
+      const errData = await response.json();
+      setTransactionError(errData.error || "Failed to update transaction.");
+      return;
+    }
+
+    setShowEditModal(false);
+    setEditTransaction(null);
+    setEditAmount("");
+    setEditNote("");
+    setEditDate("");
+    setTransactionError("");
     await fetchDashboard();
   };
 
@@ -249,6 +334,7 @@ useEffect(() => {
           type,
           category,
           note,
+          createdAt: transactionDate ? new Date(transactionDate).toISOString() : new Date().toISOString(),
         }),
       });
 
@@ -266,6 +352,7 @@ useEffect(() => {
       setCategory("");
       setNote("");
       setType("expense");
+      setTransactionDate("");
     } catch (err) {
       setTransactionError("A network error occurred.");
     } finally {
@@ -381,6 +468,16 @@ useEffect(() => {
   }, []);
 
  // Group transactions by time periods (Strictly limited to Top 3 for Dashboard)
+  const filteredTransactions = useMemo(() => {
+    if (!searchQuery.trim()) return transactions;
+    const q = searchQuery.toLowerCase();
+    return transactions.filter((t) =>
+      (t.note || "").toLowerCase().includes(q) ||
+      (t.category || "").toLowerCase().includes(q) ||
+      t.amount.toString().includes(q)
+    );
+  }, [transactions, searchQuery]);
+
   const groupedTransactions = useMemo(() => {
     const groups: { label: string; items: any[] }[] = [
       { label: "Today", items: [] },
@@ -394,8 +491,8 @@ useEffect(() => {
     const yesterday = today - 86400000;
     const lastWeek = today - 86400000 * 7;
 
-// Process all entries for the deep mobile ledger
-    transactions.forEach((t) => {
+    const source = searchQuery.trim() ? filteredTransactions : transactions;
+    source.forEach((t) => {
       const txTime = new Date(t.createdAt || Date.now()).getTime();
       if (txTime >= today) groups[0].items.push(t);
       else if (txTime >= yesterday) groups[1].items.push(t);
@@ -404,7 +501,7 @@ useEffect(() => {
     });
 
     return groups.filter((g) => g.items.length > 0);
-  }, [transactions]);
+  }, [transactions, filteredTransactions, searchQuery]);
 
   const formatTime = (dateString: string) => {
     if (!dateString) return "";
@@ -594,8 +691,8 @@ useEffect(() => {
         ) : (
           <div className="relative z-10 mx-auto max-w-7xl px-6 py-12 fade-in-up">
           {/* Top Header */}
-          <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/[0.06] pb-8">
-            <div>
+                    <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/[0.06] pb-8">
+            <div className="w-full md:w-auto">
               <div className="flex items-center gap-3 mb-4">
                 <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-[#f0c040]">
                   EXPENZA
@@ -621,6 +718,23 @@ useEffect(() => {
                   Budgets
                 </Link>
               </nav>
+
+              {/* Search Bar */}
+              <div className="relative w-full md:w-80 mt-4 md:mt-0">
+                <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5a5670]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <input
+                  type="text"
+                  placeholder="Search transactions..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl pl-10 pr-4 py-2.5 text-[13px] font-light text-[#f4f0e8] placeholder:text-[#5a5670] focus:bg-white/[0.05] focus:border-[#f0c040]/30 focus:outline-none transition-all"
+                />
+                {searchQuery && (
+                  <button onClick={() => setSearchQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#5a5670] hover:text-[#f4f0e8]">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </button>
+                )}
+              </div>
             </div>
 
 <div className="flex flex-col items-end justify-end gap-6 h-full">
@@ -748,9 +862,10 @@ useEffect(() => {
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
                     Deep Analytics
                   </button>
-                  <button onClick={() => setShowHealthDetails(true)} className="flex-shrink-0 bg-[#a1c8aa] text-[#1c1c1e] px-5 py-3.5 rounded-[20px] font-medium text-[14px] flex items-center gap-2.5 shadow-[0_4px_12px_rgba(161,200,170,0.25)] active:scale-95 transition-transform">
+                                    <button onClick={() => setShowHealthDetails(true)} className="flex-shrink-0 bg-[#a1c8aa] text-[#1c1c1e] px-5 py-3.5 rounded-[20px] font-medium text-[14px] flex items-center gap-2.5 shadow-[0_4px_12px_rgba(161,200,170,0.25)] active:scale-95 transition-transform whitespace-nowrap">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-                    Financial Health
+                    <span className="hidden sm:inline">Financial Health</span>
+                    <span className="sm:hidden">Health</span>
                   </button>
                 </div>
               </div>
@@ -779,11 +894,14 @@ useEffect(() => {
                                 <p className="font-mono text-[10px] text-[#1c1c1e]/40 mt-1 tracking-wider uppercase">{formatTime(transaction.createdAt)}</p>
                               </div>
                             </div>
-                            <div className="flex flex-col items-end gap-1">
+                                                    <div className="flex flex-col items-end gap-1">
                               <p className={`font-semibold text-[15px] tracking-tight ${transaction.type === 'income' ? 'text-[#a1c8aa]' : 'text-[#f28b82]'}`}>
                                 {transaction.type === 'income' ? '+' : '−'}₹{transaction.amount.toLocaleString('en-IN')}
                               </p>
-                              <button onClick={() => handleDeleteTransaction(transaction.id)} className="text-[9px] font-mono tracking-widest uppercase text-[#f28b82] opacity-70 hover:opacity-100 py-1">Delete</button>
+                              <div className="flex items-center gap-2">
+                                <button onClick={() => openEditModal(transaction)} className="text-[9px] font-mono tracking-widest uppercase text-[#9ea4f5] opacity-70 hover:opacity-100 py-1">Edit</button>
+                                <button onClick={() => handleDeleteTransaction(transaction.id)} className="text-[9px] font-mono tracking-widest uppercase text-[#f28b82] opacity-70 hover:opacity-100 py-1">Delete</button>
+                              </div>
                             </div>
                           </div>
                         ))}
@@ -1449,6 +1567,25 @@ useEffect(() => {
                 </h2>
               </div>
 
+              {/* Quick-add templates */}
+              <div className="flex gap-2 overflow-x-auto hide-scroll pb-2 mb-4">
+                {[
+                  { label: "Coffee", amount: "150", icon: "☕" },
+                  { label: "Petrol", amount: "500", icon: "⛽" },
+                  { label: "Groceries", amount: "2000", icon: "🥬" },
+                  { label: "Dinner", amount: "800", icon: "🍽️" },
+                ].map((template) => (
+                  <button
+                    key={template.label}
+                    onClick={() => { setAmount(template.amount); setNote(template.label); }}
+                    className="flex-shrink-0 flex items-center gap-1.5 bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.06] rounded-lg px-3 py-2 text-[11px] font-medium text-[#9e98b0] hover:text-[#f4f0e8] transition-all active:scale-95"
+                  >
+                    <span>{template.icon}</span>
+                    {template.label}
+                  </button>
+                ))}
+              </div>
+
               {transactionError && (
                 <div className="mb-6 p-4 rounded-xl bg-[#f87171]/10 border border-[#f87171]/20 flex items-center gap-3 fade-in-up">
                   <span className="text-[#f87171]">⚠️</span>
@@ -1525,6 +1662,16 @@ useEffect(() => {
                     className="custom-input w-full rounded-xl bg-[#13141a] px-4 py-3.5 text-sm font-light text-[#f4f0e8] placeholder:text-[#5a5670]"
                   />
                 </div>
+
+                <div>
+                  <label className="font-mono text-[9px] tracking-[0.2em] uppercase text-[#5a5670] mb-2 block">Date</label>
+                  <input
+                    type="date"
+                    value={transactionDate}
+                    onChange={(e) => setTransactionDate(e.target.value)}
+                    className="custom-input w-full rounded-xl bg-[#13141a] px-4 py-3.5 text-sm font-light text-[#f4f0e8] [color-scheme:dark]"
+                  />
+                </div>
               </div>
 
               <div className="flex gap-3 mt-8">
@@ -1552,6 +1699,92 @@ useEffect(() => {
             </div>
           </div>
 )}
+
+{/* Edit Transaction Modal */}
+        {showEditModal && editTransaction && (
+          <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center bg-[#0c0d10]/80 backdrop-blur-sm p-0 md:p-4 sheet-overlay">
+            <div className="absolute inset-0" onClick={() => setShowEditModal(false)} />
+            <div className="glass-card w-full max-w-md rounded-t-[32px] md:rounded-[32px] p-6 md:p-8 pb-12 md:pb-8 shadow-2xl relative max-h-[90vh] overflow-y-auto hide-scroll sheet-slide-up">
+              <div className="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-6 md:hidden" />
+              <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-[#9ea4f5] to-transparent opacity-20 hidden md:block" />
+              
+              <div className="mb-8">
+                <span className="font-mono text-[10px] tracking-[0.2em] text-[#9ea4f5] uppercase mb-2 block">
+                  // Edit Entry
+                </span>
+                <h2 className="text-3xl font-light tracking-tight text-[#f4f0e8]">
+                  Edit <strong className="font-semibold">Transaction</strong>
+                </h2>
+              </div>
+
+              {transactionError && (
+                <div className="mb-6 p-4 rounded-xl bg-[#f87171]/10 border border-[#f87171]/20 flex items-center gap-3 fade-in-up">
+                  <span className="text-[#f87171]">⚠️</span>
+                  <p className="text-xs font-medium text-[#f87171]">{transactionError}</p>
+                </div>
+              )}
+
+              <div className="space-y-4">
+                <div className="relative">
+                  <label className="font-mono text-[9px] tracking-[0.2em] uppercase text-[#5a5670] mb-2 block">Amount</label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#9e98b0] font-light">₹</span>
+                    <input
+                      type="number"
+                      placeholder="0.00"
+                      value={editAmount}
+                      onChange={(e) => setEditAmount(e.target.value)}
+                      className="custom-input w-full rounded-xl bg-[#13141a] pl-8 pr-4 py-3.5 text-sm font-light text-[#f4f0e8] placeholder:text-[#5a5670]"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="font-mono text-[9px] tracking-[0.2em] uppercase text-[#5a5670] mb-2 block">Category</label>
+                  <div className="custom-input w-full rounded-xl bg-[#13141a] px-4 py-3.5 text-sm font-light text-[#f4f0e8]">
+                    {editTransaction.category}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="font-mono text-[9px] tracking-[0.2em] uppercase text-[#5a5670] mb-2 block">Note</label>
+                  <input
+                    type="text"
+                    placeholder="What was this for?"
+                    value={editNote}
+                    onChange={(e) => setEditNote(e.target.value)}
+                    className="custom-input w-full rounded-xl bg-[#13141a] px-4 py-3.5 text-sm font-light text-[#f4f0e8] placeholder:text-[#5a5670]"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-mono text-[9px] tracking-[0.2em] uppercase text-[#5a5670] mb-2 block">Date</label>
+                  <input
+                    type="date"
+                    value={editDate}
+                    onChange={(e) => setEditDate(e.target.value)}
+                    className="custom-input w-full rounded-xl bg-[#13141a] px-4 py-3.5 text-sm font-light text-[#f4f0e8] [color-scheme:dark]"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-3 mt-8">
+                <button
+                  onClick={() => { setShowEditModal(false); setTransactionError(""); }}
+                  className="flex-1 rounded-xl btn-glass py-4 text-[13px] font-medium text-[#9e98b0]"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleEditTransaction}
+                  className="flex-1 rounded-xl btn-gold py-4 text-[13px] font-semibold text-black flex items-center justify-center gap-2"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
 {/* ── First-Time User Tutorial Overlay ── */}
             {showTutorial && (
@@ -1620,7 +1853,30 @@ useEffect(() => {
               </div>
             )}
 
-            {/* Mobile App Dock (Floating Capsule) */}
+                        {/* Undo Toast */}
+            {undoToast.show && (
+              <div className="fixed bottom-24 md:bottom-8 left-4 right-4 md:left-auto md:right-8 md:w-80 z-50 bg-[#1c1c1e] border border-white/10 rounded-2xl p-4 shadow-2xl flex items-center gap-3 fade-in-up">
+                <div className="w-8 h-8 rounded-full bg-[#34d399]/20 flex items-center justify-center text-[#34d399] flex-shrink-0">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[13px] font-medium text-[#f4f0e8] truncate">
+                    Deleted {undoToast.tx?.note || undoToast.tx?.category}
+                  </p>
+                  <p className="text-[11px] text-[#5a5670]">
+                    ₹{undoToast.tx?.amount?.toLocaleString('en-IN')}
+                  </p>
+                </div>
+                <button
+                  onClick={handleUndoDelete}
+                  className="px-4 py-2 rounded-lg bg-[#f0c040] text-[#1c1c1e] text-[12px] font-semibold active:scale-95 transition-transform flex-shrink-0"
+                >
+                  Undo
+                </button>
+              </div>
+            )}
+
+            {/* Mobile App Dock */}
             <div className="md:hidden fixed bottom-6 left-6 right-6 z-40 bg-[#1c1c1e] rounded-[32px] p-2 px-6 shadow-[0_16px_40px_rgba(0,0,0,0.5)] border border-white/5">
           <div className="flex items-center justify-between py-2">
             

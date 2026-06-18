@@ -11,6 +11,22 @@ export default function AuthPage() {
 const [loading, setLoading] = useState(false);
   const [fadeOut, setFadeOut] = useState(false);
 const [showPassword, setShowPassword] = useState(false);
+const [errors, setErrors] = useState<{ email?: string; password?: string; name?: string }>({});
+const [rememberMe, setRememberMe] = useState(false);
+
+const validate = () => {
+  const newErrors: typeof errors = {};
+  if (!email.trim()) newErrors.email = "Email is required";
+  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) newErrors.email = "Invalid email format";
+  
+  if (!password) newErrors.password = "Password is required";
+  else if (password.length < 6) newErrors.password = "Min 6 characters";
+  
+  if (!isLogin && !name.trim()) newErrors.name = "Name is required";
+  
+  setErrors(newErrors);
+  return Object.keys(newErrors).length === 0;
+};
 
 const handleSubmit = async () => {
   setLoading(true);
@@ -830,9 +846,25 @@ const handleSubmit = async () => {
     type="email"
     placeholder="you@example.com"
     value={email}
-    onChange={(e) => setEmail(e.target.value)}
+    onChange={(e) => {
+      setEmail(e.target.value);
+      if (errors.email) setErrors(prev => ({ ...prev, email: undefined }));
+    }}
+    onBlur={() => {
+      if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        setErrors(prev => ({ ...prev, email: "Invalid email format" }));
+      }
+    }}
     className="field-input"
+    style={{ borderColor: errors.email ? "var(--accent-coral)" : undefined }}
+    aria-invalid={!!errors.email}
+    aria-describedby={errors.email ? "email-error" : undefined}
   />
+  {errors.email && (
+    <p id="email-error" className="font-mono text-[9px] tracking-wider uppercase mt-2" style={{ color: "var(--accent-coral)" }}>
+      {errors.email}
+    </p>
+  )}
 </div>
 
               <div className="field-wrap">
@@ -843,9 +875,15 @@ const handleSubmit = async () => {
       type={showPassword ? "text" : "password"}
       placeholder="••••••••••••"
       value={password}
-      onChange={(e) => setPassword(e.target.value)}
+      onChange={(e) => {
+        setPassword(e.target.value);
+        if (errors.password) setErrors(prev => ({ ...prev, password: undefined }));
+      }}
+      onBlur={() => {
+        if (password && password.length < 6) setErrors(prev => ({ ...prev, password: "Min 6 characters" }));
+      }}
       className="field-input"
-      style={{ paddingRight: "48px" }}
+      style={{ paddingRight: "48px", borderColor: errors.password ? "var(--accent-coral)" : undefined }}
     />
 
     <button
@@ -861,15 +899,42 @@ const handleSubmit = async () => {
         cursor: "pointer",
         color: "#9e98b0",
       }}
+      aria-label={showPassword ? "Hide password" : "Show password"}
     >
       {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
     </button>
   </div>
+  {errors.password && (
+    <p className="font-mono text-[9px] tracking-wider uppercase mt-2" style={{ color: "var(--accent-coral)" }}>
+      {errors.password}
+    </p>
+  )}
 </div>
+
+              {/* Remember Me + Forgot Password row */}
+              <div className="flex items-center justify-between mb-2" style={{ marginTop: "-4px" }}>
+                <label className="flex items-center gap-2 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    className="w-4 h-4 rounded border border-black/10 accent-[var(--accent-mustard)] cursor-pointer"
+                  />
+                  <span className="font-mono text-[10px] tracking-wider uppercase text-[var(--text-muted)]">Remember me</span>
+                </label>
+                <a
+                  href="/forgot-password"
+                  className="font-mono text-[10px] tracking-wider uppercase text-[var(--accent-periwinkle)] hover:text-[var(--accent-mustard)] transition-colors"
+                >
+                  Forgot Password?
+                </a>
+              </div>
 
               <button
   className="submit-btn"
-  onClick={handleSubmit}
+  onClick={() => {
+    if (validate()) handleSubmit();
+  }}
   disabled={loading}
 >
   {loading ? (
@@ -896,7 +961,7 @@ const handleSubmit = async () => {
               <span>Or continue with</span>
             </div>
 
-            {/* Mobile-only circular Google button (reference-style icon row, Google only) — now sits below manual login */}
+            {/* Mobile-only circular Google button */}
             <div className="mobile-google-row">
               <button
                 type="button"
@@ -911,6 +976,20 @@ const handleSubmit = async () => {
                   <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
                 </svg>
               </button>
+            </div>
+
+            {/* Footer links */}
+            <div className="mt-8 pt-6 border-t border-[var(--border-soft)] flex flex-col items-center gap-3">
+              <div className="flex items-center gap-4">
+                <a href="/privacy" className="font-mono text-[9px] tracking-wider uppercase text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors">Privacy</a>
+                <span className="w-1 h-1 rounded-full bg-[var(--text-muted)] opacity-30" />
+                <a href="/terms" className="font-mono text-[9px] tracking-wider uppercase text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors">Terms</a>
+                <span className="w-1 h-1 rounded-full bg-[var(--text-muted)] opacity-30" />
+                <a href="mailto:support@expenza.app" className="font-mono text-[9px] tracking-wider uppercase text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors">Contact</a>
+              </div>
+              <p className="font-mono text-[8px] tracking-widest uppercase text-[var(--text-muted)] opacity-50">
+                © 2026 Expenza. All rights reserved.
+              </p>
             </div>
 
           </div>

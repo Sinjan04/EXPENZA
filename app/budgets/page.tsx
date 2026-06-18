@@ -42,6 +42,9 @@ export default function BudgetsPage() {
   // Modal Form State
   const [newCategory, setNewCategory] = useState("");
   const [newAmount, setNewAmount] = useState("");
+  const [newStartDate, setNewStartDate] = useState("");
+  const [alertThreshold, setAlertThreshold] = useState(80);
+  const [isEssential, setIsEssential] = useState(true);
   const [formError, setFormError] = useState("");
 
   // Action Modals State
@@ -195,6 +198,9 @@ export default function BudgetsPage() {
     setShowModal(false);
     setNewCategory("");
     setNewAmount("");
+    setNewStartDate("");
+    setAlertThreshold(80);
+    setIsEssential(true);
   };
 
   const handleDeleteConfirm = async () => {
@@ -449,11 +455,11 @@ export default function BudgetsPage() {
                             
                             {/* Hover/Mobile Actions */}
                             <div className="absolute top-4 right-4 flex gap-1 opacity-100 md:opacity-0 md:-translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 bg-white/95 backdrop-blur-md px-2 py-1 rounded-full border border-black/5 shadow-md">
-                              <button onClick={() => openEditModal(budget)} className="text-[#1c1c1e]/50 hover:text-[#d49a1c] p-2.5 md:p-1.5 transition-colors" title="Edit">
+                              <button onClick={() => openEditModal(budget)} className="text-[#1c1c1e]/50 hover:text-[#d49a1c] p-2.5 md:p-1.5 transition-colors" aria-label={`Edit ${budget.category} budget`}>
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                               </button>
                               <div className="w-px h-4 bg-black/10 my-auto" />
-                              <button onClick={() => { setBudgetToDelete(budget.id); setShowDeleteModal(true); }} className="text-[#1c1c1e]/50 hover:text-[#d9534f] p-2.5 md:p-1.5 transition-colors" title="Delete">
+                              <button onClick={() => { setBudgetToDelete(budget.id); setShowDeleteModal(true); }} className="text-[#1c1c1e]/50 hover:text-[#d9534f] p-2.5 md:p-1.5 transition-colors" aria-label={`Delete ${budget.category} budget`}>
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
                               </button>
                             </div>
@@ -461,7 +467,7 @@ export default function BudgetsPage() {
                         </div>
 
                         {/* Progress Bar Component */}
-                        <div>
+                                                <div>
                           <div className="flex justify-between items-end mb-2">
                             <p className="font-mono text-[9px] tracking-widest text-[#1c1c1e]/50 uppercase">
                               {remaining < 0 ? 'Overspent by' : 'Remaining'}
@@ -470,12 +476,18 @@ export default function BudgetsPage() {
                               ₹{Math.abs(remaining).toLocaleString('en-IN')}
                             </p>
                           </div>
-                          <div className="h-3 w-full bg-[var(--bg-cream)] rounded-full overflow-hidden">
+                          <div className="h-3 w-full bg-[var(--bg-cream)] rounded-full overflow-hidden relative">
                             <div
                               className={`h-full bg-gradient-to-r ${progress.gradient} rounded-full transition-all duration-1000 ease-out`}
                               style={{ width: animateBars ? `${progress.percent}%` : "0%" }}
                             />
+                            {/* Alert threshold marker (example at 80%) */}
+                            <div className="absolute top-0 bottom-0 w-0.5 bg-[#1c1c1e]/10" style={{ left: "80%" }} />
                           </div>
+                          <p className="font-mono text-[8px] tracking-wider text-[#1c1c1e]/30 mt-1.5 uppercase">
+                            {budget.spent >= budget.limit * 0.8 && budget.spent < budget.limit ? "⚠️ Approaching limit" : ""}
+                            {budget.spent > budget.limit ? "🔴 Over budget" : ""}
+                          </p>
                         </div>
                       </div>
                     );
@@ -612,6 +624,42 @@ export default function BudgetsPage() {
                       className="custom-input-dark w-full rounded-xl pl-8 pr-4 py-3.5 text-sm font-light placeholder:text-white/30"
                     />
                   </div>
+                </div>
+
+                <div>
+                  <label className="font-mono text-[9px] tracking-[0.2em] uppercase text-white/50 mb-2 block">Start Date</label>
+                  <input
+                    type="date"
+                    value={newStartDate}
+                    onChange={(e) => setNewStartDate(e.target.value)}
+                    className="custom-input-dark w-full rounded-xl px-4 py-3.5 text-sm font-light text-[#f4f0e8] [color-scheme:dark]"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-mono text-[9px] tracking-[0.2em] uppercase text-white/50 mb-2 block">Alert at {alertThreshold}%</label>
+                  <input
+                    type="range"
+                    min="50"
+                    max="95"
+                    step="5"
+                    value={alertThreshold}
+                    onChange={(e) => setAlertThreshold(Number(e.target.value))}
+                    className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-[#a1c8aa]"
+                  />
+                  <div className="flex justify-between mt-1">
+                    <span className="font-mono text-[8px] text-white/30">50%</span>
+                    <span className="font-mono text-[8px] text-white/30">95%</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                  <label className="flex items-center gap-3 cursor-pointer select-none flex-1">
+                    <div className={`w-10 h-6 rounded-full p-0.5 transition-colors ${isEssential ? 'bg-[#a1c8aa]' : 'bg-white/10'}`} onClick={() => setIsEssential(!isEssential)}>
+                      <div className={`w-5 h-5 rounded-full bg-white shadow-sm transition-transform ${isEssential ? 'translate-x-4' : 'translate-x-0'}`} />
+                    </div>
+                    <span className="text-sm font-light text-white/80">{isEssential ? "Essential (Need)" : "Discretionary (Want)"}</span>
+                  </label>
                 </div>
               </div>
 
