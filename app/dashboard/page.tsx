@@ -120,6 +120,24 @@ const [transactionError, setTransactionError] = useState("");
     setShowReminder(false);
   };
 
+  // --- ONBOARDING TUTORIAL STATE & LOGIC ---
+  const [showTutorial, setShowTutorial] = useState(false);
+  const [tutorialStep, setTutorialStep] = useState(0);
+
+  useEffect(() => {
+    if (!isLoading) {
+      const hasSeenTutorial = localStorage.getItem("expenza_tutorial_complete");
+      if (!hasSeenTutorial) {
+        setShowTutorial(true);
+      }
+    }
+  }, [isLoading]);
+
+  const completeTutorial = () => {
+    localStorage.setItem("expenza_tutorial_complete", "true");
+    setShowTutorial(false);
+  };
+
   const fetchDashboard = async () => {
     const token = localStorage.getItem("token");
 
@@ -1535,8 +1553,75 @@ useEffect(() => {
           </div>
 )}
 
-{/* Mobile App Dock (Floating Capsule) */}
-        <div className="md:hidden fixed bottom-6 left-6 right-6 z-40 bg-[#1c1c1e] rounded-[32px] p-2 px-6 shadow-[0_16px_40px_rgba(0,0,0,0.5)] border border-white/5">
+{/* ── First-Time User Tutorial Overlay ── */}
+            {showTutorial && (
+              <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#121316]/80 backdrop-blur-md p-6 fade-in-up">
+                <div className="bg-[#1c1c1e] w-full max-w-sm rounded-[32px] p-8 border border-white/5 shadow-2xl relative overflow-hidden">
+                  {/* Dynamic Accent Glow based on step */}
+                  <div 
+                    className="absolute top-0 left-0 right-0 h-1.5 transition-colors duration-500" 
+                    style={{ background: tutorialStep === 0 ? '#f6d46b' : tutorialStep === 1 ? '#a1c8aa' : tutorialStep === 2 ? '#9ea4f5' : '#f28b82' }} 
+                  />
+                  
+                  <div className="flex flex-col items-center text-center mt-2">
+                    <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mb-6 shadow-inner transition-colors duration-500"
+                      style={{
+                        backgroundColor: tutorialStep === 0 ? '#f6d46b15' : tutorialStep === 1 ? '#a1c8aa15' : tutorialStep === 2 ? '#9ea4f515' : '#f28b8215',
+                        color: tutorialStep === 0 ? '#f6d46b' : tutorialStep === 1 ? '#a1c8aa' : tutorialStep === 2 ? '#9ea4f5' : '#f28b82'
+                      }}
+                    >
+                      {tutorialStep === 0 ? "💰" : tutorialStep === 1 ? "🍱" : tutorialStep === 2 ? "🧠" : "🚀"}
+                    </div>
+                    
+                    <h3 className="text-2xl font-semibold text-white tracking-tight mb-3">
+                      {tutorialStep === 0 ? "Set Your Baseline" : tutorialStep === 1 ? "The Command Center" : tutorialStep === 2 ? "Deep Analytics" : "Stay Consistent"}
+                    </h3>
+                    
+                    <p className="text-sm font-light text-[#8e8e93] leading-relaxed mb-8 min-h-[80px]">
+                      {tutorialStep === 0 
+                        ? "Welcome to Expenza! Let's build your foundation. Tap any '+' Add button and log your current bank balance or salary as an 'Income' to begin."
+                        : tutorialStep === 1 
+                        ? "Your Bento grid gives you an instant snapshot of your wealth. Watch your income, expenses, and savings automatically update in real-time."
+                        : tutorialStep === 2 
+                        ? "Don't just track—understand. Tap the Deep Analytics or Financial Health buttons to uncover your cashflow velocity and top spending habits."
+                        : "Small habits build wealth. Use the floating '+' button at the bottom of your screen to quickly log expenses on the go. You're ready!"}
+                    </p>
+
+                    {/* Pagination Dots */}
+                    <div className="flex gap-2 mb-8">
+                      {[0, 1, 2, 3].map((step) => (
+                        <div 
+                          key={step} 
+                          className={`h-1.5 rounded-full transition-all duration-300 ${tutorialStep === step ? 'w-6 bg-white' : 'w-1.5 bg-white/20'}`} 
+                        />
+                      ))}
+                    </div>
+
+                    <div className="flex w-full gap-3">
+                      <button 
+                        onClick={completeTutorial}
+                        className="flex-1 py-3.5 rounded-xl font-medium text-[13px] text-[#8e8e93] bg-white/5 hover:text-white transition-colors"
+                      >
+                        Skip Intro
+                      </button>
+                      <button 
+                        onClick={() => {
+                          if (tutorialStep < 3) setTutorialStep(s => s + 1);
+                          else completeTutorial();
+                        }}
+                        className="flex-1 py-3.5 rounded-xl font-semibold text-[13px] text-[#1c1c1e] transition-all active:scale-95"
+                        style={{ backgroundColor: tutorialStep === 0 ? '#f6d46b' : tutorialStep === 1 ? '#a1c8aa' : tutorialStep === 2 ? '#9ea4f5' : '#f28b82' }}
+                      >
+                        {tutorialStep === 3 ? "Let's Go!" : "Next"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Mobile App Dock (Floating Capsule) */}
+            <div className="md:hidden fixed bottom-6 left-6 right-6 z-40 bg-[#1c1c1e] rounded-[32px] p-2 px-6 shadow-[0_16px_40px_rgba(0,0,0,0.5)] border border-white/5">
           <div className="flex items-center justify-between py-2">
             
             <div className="flex items-center gap-3 text-[#f6d46b] bg-[#f6d46b]/10 px-5 py-2.5 rounded-full">
