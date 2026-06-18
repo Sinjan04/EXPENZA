@@ -376,8 +376,8 @@ useEffect(() => {
     const yesterday = today - 86400000;
     const lastWeek = today - 86400000 * 7;
 
-    // Slice to only process the 3 most recent entries
-    transactions.slice(0, 3).forEach((t) => {
+// Process all entries for the deep mobile ledger
+    transactions.forEach((t) => {
       const txTime = new Date(t.createdAt || Date.now()).getTime();
       if (txTime >= today) groups[0].items.push(t);
       else if (txTime >= yesterday) groups[1].items.push(t);
@@ -723,9 +723,22 @@ useEffect(() => {
                 </div>
               </div>
 
-{/* 2. Split-Screen Ledger (Cream Bottom Overlay) */}
-              <div className="block lg:hidden w-[calc(100%+48px)] -mx-6 mt-8 bg-[#e2e5de] text-[#1c1c1e] rounded-t-[40px] p-8 shadow-[0_-12px_40px_rgba(0,0,0,0.3)] relative z-20" style={{ paddingBottom: '140px', marginBottom: '-120px' }}>
-                <div className="w-12 h-1.5 bg-black/10 rounded-full mx-auto mb-8" />
+{/* 1.5 Quick Action Pills (Mobile Only) */}
+              <div className="block lg:hidden w-[calc(100%+48px)] -mx-6 px-6 mt-6 mb-2 relative z-10">
+                <div className="flex overflow-x-auto hide-scroll gap-4 pb-4">
+                  <button onClick={() => setShowInsights(true)} className="flex-shrink-0 bg-[#9ea4f5] text-[#1c1c1e] px-5 py-3.5 rounded-[20px] font-medium text-[14px] flex items-center gap-2.5 shadow-[0_4px_12px_rgba(158,164,245,0.25)] active:scale-95 transition-transform">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+                    Deep Analytics
+                  </button>
+                  <button onClick={() => setShowHealthDetails(true)} className="flex-shrink-0 bg-[#a1c8aa] text-[#1c1c1e] px-5 py-3.5 rounded-[20px] font-medium text-[14px] flex items-center gap-2.5 shadow-[0_4px_12px_rgba(161,200,170,0.25)] active:scale-95 transition-transform">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                    Financial Health
+                  </button>
+                </div>
+              </div>
+
+              {/* 2. Split-Screen Ledger (Cream Bottom Overlay) */}
+              <div className="block lg:hidden w-[calc(100%+48px)] -mx-6 mt-4 bg-[#e2e5de] text-[#1c1c1e] rounded-t-[40px] p-8 shadow-[0_-12px_40px_rgba(0,0,0,0.2)] relative z-20" style={{ paddingBottom: '140px', marginBottom: '-120px' }}>
                 
                 <div className="flex justify-between items-center mb-8">
                   <h3 className="text-xl font-medium tracking-tight">Transactions</h3>
@@ -762,23 +775,8 @@ useEffect(() => {
                 </div>
               </div>
 
-              {/* 3. Analytics Header & Carousel Start */}
-              <div className="block lg:hidden mt-4 mb-2">
-                <div className="flex justify-between items-end px-1">
-                  <h3 className="text-lg font-light tracking-wide text-[#f4f0e8]">Analytics Center</h3>
-                  
-                  {/* Ultra-Minimalist Swipe Hint */}
-                  <div className="flex items-center gap-1.5 text-[#5a5670] select-none">
-                    <span className="font-mono text-[9px] tracking-[0.25em] uppercase pb-[1px]">Swipe</span>
-                    <svg className="w-3.5 h-3.5 animate-swipe-hint" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                    </svg>
-                  </div>
-
-                </div>
-              </div>
-
-              <div className="mobile-carousel lg:flex lg:flex-col lg:gap-8 w-full">
+{/* 3. Desktop Analytics Wrapper (Hidden on Mobile) */}
+              <div className="hidden lg:flex lg:flex-col lg:gap-8 w-full">
 
               {/* Cashflow Visualization */}
               <div className="glass-card rounded-3xl p-8 min-h-[260px] flex flex-col relative overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl">
@@ -1291,9 +1289,9 @@ useEffect(() => {
                 </h2>
               </div>
 
-              <div className="flex-1 overflow-y-auto hide-scroll pr-2 space-y-8">
+<div className="flex-1 overflow-y-auto hide-scroll pr-2 space-y-8">
                 
-{/* 3-Grid Top Metrics */}
+               {/* 3-Grid Top Metrics */}
                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="rounded-2xl bg-[#0d2118] border border-[#34d399]/20 p-6 relative overflow-hidden transition-all duration-300 hover:-translate-y-[2px] hover:shadow-[0_8px_24px_rgba(52,211,153,0.15)]">
                     <p className="font-mono text-[10px] text-[#34d399] opacity-80 uppercase tracking-widest mb-4">Savings Rate</p>
@@ -1320,6 +1318,57 @@ useEffect(() => {
                     </div>
                     <p className="text-xs font-light text-[#f0c040] opacity-70 mt-2">Highest cash drain</p>
                     <div className="absolute top-0 right-0 w-32 h-32 bg-[#f0c040]/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/3" />
+                  </div>
+                </div>
+                {/* NEW: Increased Information Depth (Cashflow & Donut) */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Cashflow Deep Dive */}
+                  <div className="bg-[#1c1c1e] border border-white/5 rounded-3xl p-8">
+                    <h3 className="text-lg font-light tracking-wide text-[#f4f0e8] mb-8">Cashflow Velocity</h3>
+                    <div className="space-y-6">
+                      <div>
+                        <div className="flex justify-between items-end mb-2">
+                          <p className="font-mono text-[10px] tracking-widest text-[#a1c8aa] uppercase">Income</p>
+                          <p className="text-[#a1c8aa] font-medium tracking-tight">₹{dashboardData.totalIncome.toLocaleString('en-IN')}</p>
+                        </div>
+                        <div className="h-4 w-full bg-white/5 rounded-full overflow-hidden">
+                          <div className="h-full bg-[#a1c8aa] rounded-full transition-all duration-1000 ease-out" style={{ width: dashboardData.totalIncome > 0 ? `${(dashboardData.totalIncome / Math.max(dashboardData.totalIncome, dashboardData.totalExpense)) * 100}%` : "0%" }} />
+                        </div>
+                      </div>
+                      <div>
+                        <div className="flex justify-between items-end mb-2">
+                          <p className="font-mono text-[10px] tracking-widest text-[#f28b82] uppercase">Expense</p>
+                          <p className="text-[#f28b82] font-medium tracking-tight">₹{dashboardData.totalExpense.toLocaleString('en-IN')}</p>
+                        </div>
+                        <div className="h-4 w-full bg-white/5 rounded-full overflow-hidden">
+                          <div className="h-full bg-[#f28b82] rounded-full transition-all duration-1000 ease-out" style={{ width: dashboardData.totalExpense > 0 ? `${(dashboardData.totalExpense / Math.max(dashboardData.totalIncome, dashboardData.totalExpense)) * 100}%` : "0%" }} />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Donut Chart Deep Dive */}
+                  <div className="bg-[#1c1c1e] border border-white/5 rounded-3xl p-8 flex items-center justify-center relative">
+                    <div className="relative w-40 h-40">
+                      <svg viewBox="0 0 42 42" className="w-full h-full -rotate-90 drop-shadow-xl">
+                        <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="rgba(255,255,255,0.05)" strokeWidth="6" />
+                        {(() => {
+                          let cumulativePercent = 0;
+                          return expensesByCategory.map((exp, i) => {
+                            const percent = dashboardData.totalExpense > 0 ? (exp.value / dashboardData.totalExpense) * 100 : 0;
+                            const offset = -cumulativePercent;
+                            cumulativePercent += percent;
+                            return <circle key={exp.name} cx="21" cy="21" r="15.915" fill="transparent" stroke={pieColors[i % pieColors.length]} strokeWidth="6" strokeDasharray={`${percent} 100`} strokeDashoffset={offset} />;
+                          });
+                        })()}
+                      </svg>
+                      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                        <span className="font-mono text-[9px] tracking-widest text-white/50 uppercase mb-0.5">Spent</span>
+                        <span className="text-[#f4f0e8] font-semibold text-sm tracking-tight">
+                          ₹{dashboardData.totalExpense >= 10000 ? (dashboardData.totalExpense / 1000).toFixed(1) + 'k' : dashboardData.totalExpense.toLocaleString('en-IN')}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 {/* Top 5 Categories Breakdown */}
