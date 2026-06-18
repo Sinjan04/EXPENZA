@@ -521,11 +521,8 @@ useEffect(() => {
         }
       `}</style>
 
-      <main className="min-h-screen pb-24 md:pb-0 bg-[#0c0d10] text-[#f4f0e8] font-sora relative overflow-hidden selection:bg-[#f0c040]/30 selection:text-white">
-        {/* Ambient Glow Backgrounds */}
-        <div className="absolute top-[-300px] left-[-200px] w-[800px] h-[800px] rounded-full glow-pool-gold blur-[100px] pointer-events-none" />
-  <div className="absolute bottom-[-200px] right-[-100px] w-[600px] h-[600px] rounded-full glow-pool-emerald blur-[100px] pointer-events-none" />
-
+<main className="min-h-screen pb-24 md:pb-0 bg-[#121316] text-[#f4f0e8] font-sora relative overflow-hidden selection:bg-[#f6d46b]/30 selection:text-black">
+        {/* Removed ambient orbs for clean, flat solid design */}
         {isLoading ? (
           <div className="relative z-10 mx-auto max-w-7xl px-6 py-12">
             <div className="animate-pulse flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/[0.06] pb-8 mb-12">
@@ -685,67 +682,83 @@ useEffect(() => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             {/* LEFT COLUMN */}
             <div className="lg:col-span-8 flex flex-col gap-8">
-{/* 1. Mobile-Native Hero Hub */}
-              <div className="flex flex-col gap-3">
-                <div className="glass-card rounded-[32px] p-8 md:p-10 flex flex-col items-center justify-center text-center relative overflow-hidden transition-all duration-300 hover:-translate-y-1">
-                  <div className="absolute top-0 right-0 w-48 h-48 bg-[#f0c040]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-                  <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#5a5670] mb-3">Total Balance</p>
-                  <h2 className="text-4xl md:text-5xl font-semibold tracking-tight text-[#f4f0e8]">
-                    <span className="text-[#9e98b0] font-light mr-1">₹</span>
-                    {Math.round(animatedBalance).toLocaleString('en-IN')}
-                  </h2>
+{/* 1. Mobile-Native Bento Hub */}
+              <div className="flex flex-col gap-4">
+                {/* Top Bento Row */}
+                <div className="flex gap-4">
+                  {/* Main Balance */}
+                  <div className="flex-1 bg-[#f6d46b] rounded-[32px] p-6 relative overflow-hidden transition-all duration-300 shadow-[0_8px_32px_rgba(246,212,107,0.15)]">
+                    <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#7a6330] mb-2">Total Balance</p>
+                    <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-[#1c1c1e]">
+                      <span className="opacity-50 font-light mr-1">₹</span>
+                      {Math.round(animatedBalance).toLocaleString('en-IN')}
+                    </h2>
+                  </div>
+                  {/* Quick Add Action */}
+                  <button 
+                    onClick={() => { setTransactionError(""); setShowModal(true); }}
+                    className="w-24 bg-[#1c1c1e] rounded-[32px] border border-white/5 p-4 flex flex-col items-center justify-center gap-2 text-white shadow-lg active:scale-95 transition-all"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center border border-white/5">
+                      <span className="text-xl leading-none font-light mb-[2px]">+</span>
+                    </div>
+                    <span className="font-mono text-[9px] uppercase tracking-widest text-[#9e98b0]">Add</span>
+                  </button>
                 </div>
 
-                <div className="grid grid-cols-3 gap-3">
-                  <div className="bg-[#0d2118] border border-[#34d399]/20 rounded-2xl p-4 text-center group transition-all">
-                    <p className="font-mono text-[9px] uppercase tracking-widest text-[#34d399] mb-1 opacity-80">Income</p>
-                    <p className="text-[12px] sm:text-[14px] font-semibold text-[#34d399] tracking-tight truncate">₹{dashboardData.totalIncome.toLocaleString('en-IN')}</p>
+                {/* Bottom Bento Stats */}
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="bg-[#a1c8aa] rounded-3xl p-5 text-center shadow-sm">
+                    <p className="font-mono text-[9px] uppercase tracking-widest text-[#1c1c1e]/60 mb-1">Income</p>
+                    <p className="text-[13px] font-semibold text-[#1c1c1e] tracking-tight truncate">₹{dashboardData.totalIncome.toLocaleString('en-IN')}</p>
                   </div>
-                  <div className="bg-[#261012] border border-[#f87171]/20 rounded-2xl p-4 text-center group transition-all">
-                    <p className="font-mono text-[9px] uppercase tracking-widest text-[#f87171] mb-1 opacity-80">Expense</p>
-                    <p className="text-[12px] sm:text-[14px] font-semibold text-[#f87171] tracking-tight truncate">₹{dashboardData.totalExpense.toLocaleString('en-IN')}</p>
+                  <div className="bg-[#f28b82] rounded-3xl p-5 text-center shadow-sm">
+                    <p className="font-mono text-[9px] uppercase tracking-widest text-[#1c1c1e]/60 mb-1">Expense</p>
+                    <p className="text-[13px] font-semibold text-[#1c1c1e] tracking-tight truncate">₹{dashboardData.totalExpense.toLocaleString('en-IN')}</p>
                   </div>
-                  <div className="bg-[#0e1726] border border-[#3b82f6]/20 rounded-2xl p-4 text-center group transition-all">
-                    <p className="font-mono text-[9px] uppercase tracking-widest text-[#3b82f6] mb-1 opacity-80">Saved</p>
-                    <p className="text-[12px] sm:text-[14px] font-semibold text-[#3b82f6] tracking-tight truncate">₹{savings.toLocaleString('en-IN')}</p>
+                  <div className="bg-[#9ea4f5] rounded-3xl p-5 text-center shadow-sm">
+                    <p className="font-mono text-[9px] uppercase tracking-widest text-[#1c1c1e]/60 mb-1">Saved</p>
+                    <p className="text-[13px] font-semibold text-[#1c1c1e] tracking-tight truncate">₹{savings.toLocaleString('en-IN')}</p>
                   </div>
                 </div>
               </div>
 
-              {/* 2. Priority Ledger (Mobile Only - Forces transactions to the top) */}
-              <div className="block lg:hidden w-full mt-4">
-                <div className="glass-card rounded-3xl p-6 flex flex-col h-auto transition-all duration-300">
-                  <div className="flex justify-between items-center mb-6">
-                    <h3 className="text-lg font-light tracking-wide text-[#f4f0e8]">Recent Activity</h3>
-                    <span className="font-mono text-[10px] tracking-widest text-[#f0c040] uppercase bg-[#f0c040]/10 px-3 py-1 rounded-full border border-[#f0c040]/20">Latest 3</span>
-                  </div>
-                  <div className="flex-1 overflow-visible space-y-4">
-                    {groupedTransactions.length === 0 ? (
-                      <p className="text-[13px] text-[#5a5670] text-center py-4">No recent activity.</p>
-                    ) : (
-                      groupedTransactions.map((group) => (
-                        <div key={group.label} className="space-y-3">
-                          {group.items.map((transaction) => (
-                            <div key={transaction.id} className="flex items-center justify-between p-3.5 rounded-2xl bg-white/[0.015] border border-white/[0.04]">
-                              <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-xl bg-black/40 border border-white/[0.05] flex items-center justify-center text-lg">{getCategoryEmoji(transaction.category)}</div>
-                                <div>
-                                  <p className="text-[14px] font-medium text-[#f4f0e8] truncate max-w-[120px]">{transaction.note || transaction.category}</p>
-                                  <p className="font-mono text-[9px] text-[#9e98b0] mt-0.5 tracking-wider uppercase">{transaction.category}</p>
-                                </div>
-                              </div>
-<div className="flex flex-col items-end gap-1">
-                                <p className={`font-semibold tracking-tight ${transaction.type === 'income' ? 'text-[#34d399]' : 'text-[#f87171]'}`}>
-                                  {transaction.type === 'income' ? '+' : '−'}₹{transaction.amount.toLocaleString('en-IN')}
-                                </p>
-                                <button onClick={() => handleDeleteTransaction(transaction.id)} className="text-[10px] font-mono tracking-widest uppercase text-[#f87171] opacity-70 hover:opacity-100 py-1">Delete</button>
+{/* 2. Split-Screen Ledger (Cream Bottom Overlay) */}
+              <div className="block lg:hidden w-[calc(100%+48px)] -mx-6 mt-8 bg-[#e2e5de] text-[#1c1c1e] rounded-t-[40px] p-8 shadow-[0_-12px_40px_rgba(0,0,0,0.3)] relative z-20" style={{ paddingBottom: '140px', marginBottom: '-120px' }}>
+                <div className="w-12 h-1.5 bg-black/10 rounded-full mx-auto mb-8" />
+                
+                <div className="flex justify-between items-center mb-8">
+                  <h3 className="text-xl font-medium tracking-tight">Transactions</h3>
+                  <span className="font-mono text-[10px] tracking-widest text-[#1c1c1e]/50 uppercase">Latest</span>
+                </div>
+                
+                <div className="flex-1 overflow-visible space-y-5">
+                  {groupedTransactions.length === 0 ? (
+                    <p className="text-[13px] text-[#1c1c1e]/50 text-center py-4">No recent activity.</p>
+                  ) : (
+                    groupedTransactions.map((group) => (
+                      <div key={group.label} className="space-y-4">
+                        <p className="font-mono text-[9px] tracking-widest text-[#1c1c1e]/40 uppercase mb-2 ml-2">{group.label}</p>
+                        {group.items.map((transaction) => (
+                          <div key={transaction.id} className="flex items-center justify-between bg-white rounded-[24px] p-4 shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-black/5">
+                            <div className="flex items-center gap-4">
+                              <div className="w-12 h-12 rounded-full bg-[#e2e5de]/50 flex items-center justify-center text-xl">{getCategoryEmoji(transaction.category)}</div>
+                              <div>
+                                <p className="text-[15px] font-medium text-[#1c1c1e] truncate max-w-[120px]">{transaction.note || transaction.category}</p>
+                                <p className="font-mono text-[10px] text-[#1c1c1e]/40 mt-1 tracking-wider uppercase">{formatTime(transaction.createdAt)}</p>
                               </div>
                             </div>
-                          ))}
-                        </div>
-                      ))
-                    )}
-                  </div>
+                            <div className="flex flex-col items-end gap-1">
+                              <p className={`font-semibold text-[15px] tracking-tight ${transaction.type === 'income' ? 'text-[#a1c8aa]' : 'text-[#f28b82]'}`}>
+                                {transaction.type === 'income' ? '+' : '−'}₹{transaction.amount.toLocaleString('en-IN')}
+                              </p>
+                              <button onClick={() => handleDeleteTransaction(transaction.id)} className="text-[9px] font-mono tracking-widest uppercase text-[#f28b82] opacity-70 hover:opacity-100 py-1">Delete</button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
 
@@ -1473,29 +1486,26 @@ useEffect(() => {
           </div>
 )}
 
-{/* Mobile App Dock (Bottom Nav) */}
-        <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0c0d10]/80 backdrop-blur-2xl border-t border-white/[0.05] pb-safe pt-2 px-6 shadow-[0_-8px_32px_rgba(0,0,0,0.4)]">
-          <div className="flex items-center justify-between pb-4">
+{/* Mobile App Dock (Floating Capsule) */}
+        <div className="md:hidden fixed bottom-6 left-6 right-6 z-40 bg-[#1c1c1e] rounded-[32px] p-2 px-6 shadow-[0_16px_40px_rgba(0,0,0,0.5)] border border-white/5">
+          <div className="flex items-center justify-between py-2">
             
-            <div className="flex flex-col items-center gap-1 text-[#f0c040] flex-1">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
-              <span className="text-[10px] font-medium tracking-wide mt-1">Dashboard</span>
+            <div className="flex items-center gap-3 text-[#f6d46b] bg-[#f6d46b]/10 px-5 py-2.5 rounded-full">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+              <span className="text-[11px] font-medium tracking-wide">Home</span>
             </div>
 
-            {/* Central Floating Action Button */}
-            <div className="flex-1 flex justify-center -mt-8 relative z-50">
+            <div className="flex items-center gap-2">
+              <Link href="/budgets" className="flex items-center justify-center w-12 h-12 rounded-full text-[#8e8e93] hover:text-white hover:bg-white/5 transition-all">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              </Link>
               <button 
                 onClick={() => { setTransactionError(""); setShowModal(true); }}
-                className="w-14 h-14 rounded-full bg-gradient-to-tr from-[#e8a020] to-[#f0c040] text-black shadow-[0_8px_24px_rgba(240,192,64,0.4)] flex items-center justify-center transform active:scale-95 transition-all"
+                className="flex items-center justify-center w-12 h-12 rounded-full bg-[#f6d46b] text-[#1c1c1e] active:scale-95 transition-all shadow-[0_4px_12px_rgba(246,212,107,0.3)] ml-2"
               >
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
               </button>
             </div>
-
-            <Link href="/budgets" className="flex flex-col items-center gap-1 text-[#5a5670] hover:text-[#e0dceb] transition-colors flex-1">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-              <span className="text-[10px] font-medium tracking-wide mt-1">Budgets</span>
-            </Link>
 
           </div>
         </div>
