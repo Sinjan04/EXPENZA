@@ -126,113 +126,133 @@ const handleSubmit = async () => {
           margin-bottom: 12px;
         }
 
-        @media (max-width: 1024px) {
-  .auth-root {
-    grid-template-columns: 1fr;
-    overflow-y: auto;
-    overflow-x: hidden;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    padding: 0;
-  }
+@media (max-width: 1024px) {
+          .auth-root {
+            grid-template-columns: 1fr;
+            overflow-y: auto;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding: 0;
+            background: var(--card-dark); /* 1. Sets the top half to Charcoal */
+          }
 
-  /* 1. Compact brand intro — short title only, no hero/stats takeover */
-  .left-panel {
-    display: flex !important;
-    position: relative;
-    padding: max(28px, env(safe-area-inset-top)) 24px 4px;
-    flex: 0 0 auto;
-    text-align: center;
-    justify-content: center;
-  }
-  .left-panel > div { width: 100%; }
-  .brand-tag { font-size: 22px; margin-bottom: 6px; }
-  .hero-headline { font-size: 22px; font-weight: 400; }
-  .hero-headline .accent-line { display: inline; }
-  .hero-sub, .stat-row { display: none; }
-  .mobile-brand { display: none; }
-  .center-divider { display: none; }
+          /* 2. Dramatic Dark Header */
+          .left-panel {
+            display: flex !important;
+            position: relative;
+            padding: max(8vh, env(safe-area-inset-top)) 24px 6vh;
+            flex: 0 0 auto;
+            text-align: center;
+            justify-content: center;
+          }
+          .left-panel > div { width: 100%; }
+          .brand-tag { 
+            font-size: 14px !important; 
+            margin-bottom: 16px !important; 
+            color: var(--accent-mustard) !important;
+            letter-spacing: 0.3em !important;
+          }
+          .hero-headline { 
+            font-size: 32px !important; 
+            font-weight: 300 !important; 
+            color: var(--card-light) !important; 
+          }
+          .hero-headline .accent-line { 
+            display: block !important; 
+            margin-top: 6px;
+          }
+          .hero-sub, .stat-row { display: none !important; }
+          .mobile-brand { display: none; }
+          .center-divider { display: none; }
 
-  /* 2. Form flows statically in-page — no fixed sheet, no overlay, no drag */
-  .right-panel {
-    position: relative;
-    inset: auto;
-    background: transparent;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    z-index: 10;
-    padding: 12px 20px max(28px, env(safe-area-inset-bottom));
-    align-items: stretch;
-    opacity: 1;
-    pointer-events: auto;
-    flex: 1 1 auto;
-  }
-  .right-panel .absolute.inset-0 { display: none; }
+          /* 3. The Overlapping Cream Sheet */
+          .right-panel {
+            position: relative;
+            inset: auto;
+            background: var(--bg-cream); /* Light cream workspace */
+            border-radius: 40px 40px 0 0;
+            padding: 40px 20px max(40px, env(safe-area-inset-bottom));
+            align-items: stretch;
+            opacity: 1;
+            pointer-events: auto;
+            flex: 1 1 auto;
+            box-shadow: 0 -16px 48px rgba(0, 0, 0, 0.3);
+          }
+          
+          /* Visual Drag Pill for the sheet */
+          .right-panel::before {
+            content: '';
+            position: absolute;
+            top: 14px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 48px;
+            height: 5px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 10px;
+          }
 
-  .form-shell {
-    width: 100%;
-    max-width: 440px;
-    margin: 0 auto;
-    background: var(--card-light);
-    border-radius: 24px;
-    border: 1px solid var(--border-soft);
-    padding: 32px 24px max(24px, env(safe-area-inset-bottom));
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.06);
-    transform: none;
-    position: relative;
-  }
+          /* 4. The White Form Bento Box */
+          .form-shell {
+            width: 100%;
+            max-width: 440px;
+            margin: 0 auto;
+            background: var(--card-light);
+            border-radius: 32px;
+            border: 1px solid var(--border-soft);
+            padding: 32px 24px max(24px, env(safe-area-inset-bottom));
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.05);
+            transform: none;
+            position: relative;
+          }
 
-  /* 3. Hide all floating background transaction cards on mobile */
-  .txn-card-1,
-  .txn-card-3,
-  .txn-card-4 { display: none; }
-  .hide-on-mobile { display: none; }
-  .terminal-header { align-items: center; justify-content: center; text-align: center; }
+          /* Hide floating background transaction cards on mobile */
+          .txn-card { display: none !important; }
+          .hide-on-mobile { display: none; }
+          .terminal-header { align-items: center; justify-content: center; text-align: center; }
 
-  /* Larger touch targets */
-  .field-input { padding: 15px 16px; }
-  .submit-btn { padding: 18px; font-size: 14px; margin-top: 14px; }
-  .form-title { font-size: clamp(24px, 7vw, 30px); margin-bottom: 8px; }
+          /* Larger touch targets */
+          .field-input { padding: 15px 16px; }
+          .submit-btn { padding: 18px; font-size: 14px; margin-top: 14px; }
+          .form-title { font-size: clamp(24px, 7vw, 30px); margin-bottom: 8px; }
 
-/* Mobile: hide the desktop pill Google button + its divider, show only the circular one below the form */
-  .google-btn { display: none; }
-  .auth-divider.desktop-only { display: none !important; }
-  .auth-divider.mobile-only-divider { display: flex !important; margin-top: 24px; }
-  .mobile-google-row { display: flex !important; }
+          /* Mobile Google Logic */
+          .google-btn { display: none !important; }
+          .auth-divider.desktop-only { display: none !important; }
+          .auth-divider.mobile-only-divider { display: flex !important; margin-top: 24px; }
+          .mobile-google-row { display: flex !important; }
+        }
 
-  /* Force-hide stat row (2.4Cr / 98% / 24/7 cards) on mobile */
-  .stat-row { display: none !important; }
-}
-}
+        @media (min-width: 1025px) {
+          .mobile-only-divider,
+          .mobile-google-row {
+            display: none !important;
+          }
+        }
 
-@media (min-width: 1025px) {
-  .mobile-only-divider,
-  .mobile-google-row {
-    display: none !important;
-  }
-}
-
-/* Circular Google icon button, reference-style — mobile only */
-.mobile-google-row {
-  display: none;
-  justify-content: center;
-  margin-bottom: 8px;
-}
-.mobile-google-circle {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.25s ease;
-}
-.mobile-google-circle:active { transform: scale(0.95); background: rgba(255,255,255,0.08); }
-.mobile-google-circle svg { width: 20px; height: 20px; }
+        /* 5. Circular Google Button (Updated for Light Theme) */
+        .mobile-google-row {
+          display: none;
+          justify-content: center;
+          margin-bottom: 8px;
+        }
+        .mobile-google-circle {
+          width: 56px;
+          height: 56px;
+          border-radius: 50%;
+          background: var(--card-light);
+          border: 1px solid var(--border-soft);
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.25s ease;
+        }
+        .mobile-google-circle:active { transform: scale(0.95); background: #f4f4f4; }
+        .mobile-google-circle svg { width: 22px; height: 22px; }
 
 /* ── ANIMATED BACKGROUND LAYER ── */
         .bg-stage {
