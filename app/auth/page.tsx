@@ -152,175 +152,98 @@ const handleSubmit = async () => {
             flex-direction: column;
             min-height: 100vh;
             padding: 0;
-            background: var(--card-dark); /* 1. Sets the top half to Charcoal */
+            background: var(--card-dark); /* Solid Charcoal Mobile Background */
           }
+          .bg-stage { display: none; } /* Hide desktop bg on mobile */
 
-          /* 2. Dramatic Dark Header */
+          /* Dark Header Intro */
           .left-panel {
             display: flex !important;
             position: relative;
-            padding: max(8vh, env(safe-area-inset-top)) 24px 6vh;
+            padding: max(6vh, env(safe-area-inset-top)) 16px 6vh; /* Adjusted for wider cards */
             flex: 1 1 auto;
             min-height: 100vh;
             text-align: center;
             justify-content: center;
-            padding-bottom: 160px;
+            padding-bottom: 220px; /* Space for CTA bar */
           }
           .left-panel > div { width: 100%; }
           .brand-tag { 
             font-size: 14px !important; 
             margin-bottom: 16px !important; 
-            color: var(--accent-mustard) !important;
+            color: var(--card-light) !important;
             letter-spacing: 0.3em !important;
+            opacity: 0.5;
           }
           .hero-headline { 
-            font-size: 32px !important; 
+            font-size: 36px !important; 
             font-weight: 300 !important; 
             color: var(--card-light) !important; 
           }
           .hero-headline .accent-line { 
             display: block !important; 
             margin-top: 6px;
+            color: var(--accent-mustard) !important;
           }
-          .hero-sub, .stat-row { display: none !important; }
-          .mobile-brand { display: none; }
-          .center-divider { display: none; }
+          .hero-sub, .stat-row, .center-divider { display: none !important; }
 
-          /* 3. The Overlapping Cream Sheet */
-          .right-panel {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background: var(--bg-cream);
-            border-radius: 40px 40px 0 0;
-            padding: 40px 20px max(40px, env(safe-area-inset-bottom));
-            opacity: 1;
-            pointer-events: auto;
-            box-shadow: 0 -16px 48px rgba(0, 0, 0, 0.3);
-            transform: translateY(105%);
-            transition: transform 0.55s cubic-bezier(0.32, 0.72, 0, 1);
-            z-index: 50;
-            max-height: 92vh;
-            overflow-y: auto;
-          }
-          .right-panel.sheet-active {
-            transform: translateY(0);
-          }
-          /* Visual Drag Pill for the sheet */
-          .right-panel::before {
-            content: '';
-            position: absolute;
-            top: 14px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 48px;
-            height: 5px;
-            background: rgba(0,0,0,0.1);
-            border-radius: 10px;
-          }
-          .mobile-cta-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            z-index: 40;
-            padding: 20px 24px max(24px, env(safe-area-inset-bottom));
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            background: linear-gradient(to top, rgba(28,28,30,0.98) 0%, rgba(28,28,30,0.9) 70%, transparent 100%);
-            pointer-events: none;
-          }
-          .mobile-cta-bar > * {
-            pointer-events: auto;
-          }
-          .mobile-cta-bar.hidden {
-            display: none;
-          }
-          .mobile-cta-btn {
-            width: 100%;
-            padding: 16px;
-            border-radius: 16px;
-            font-family: 'Sora', sans-serif;
-            font-size: 14px;
-            font-weight: 600;
-            letter-spacing: 0.04em;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border: none;
-          }
-          .mobile-cta-btn.primary {
-            background: var(--card-light);
-            color: var(--text-main);
-            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-          }
-          .mobile-cta-btn.primary:active {
-            transform: scale(0.98);
-          }
-          .mobile-cta-btn.secondary {
-            background: transparent;
-            color: var(--card-light);
-            border: 1px solid rgba(255,255,255,0.15);
-          }
-          .mobile-cta-btn.secondary:active {
-            background: rgba(255,255,255,0.05);
-          }
+          /* Mobile Features Section (Solid Pastel Variants) */
           .mobile-features {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 16px;
             margin-top: 40px;
-            padding: 0 8px;
+            padding: 0; /* Removed padding to maximize width */
             text-align: left;
           }
           .mobile-feature-item {
             display: flex;
             gap: 16px;
             align-items: flex-start;
-            padding: 16px;
-            background: rgba(255,255,255,0.03);
-            border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.05);
-            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 24px;
+            border: none;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
           }
+          
+          /* Pastel Bento Feature Cards */
+          .mobile-feature-item:nth-child(1) { background: var(--accent-sage); color: var(--card-dark); }
+          .mobile-feature-item:nth-child(2) { background: var(--accent-mustard); color: var(--card-dark); }
+          .mobile-feature-item:nth-child(3) { background: var(--accent-periwinkle); color: var(--card-dark); }
+
           .mobile-feature-icon {
             font-size: 24px;
-            width: 44px;
-            height: 44px;
+            width: 48px;
+            height: 48px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(255,255,255,0.05);
-            border-radius: 14px;
+            background: rgba(255,255,255,0.4);
+            border-radius: 16px;
             flex-shrink: 0;
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.5);
           }
           .mobile-feature-title {
             font-family: 'Sora', sans-serif;
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--card-light);
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--card-dark);
             margin-bottom: 4px;
           }
           .mobile-feature-desc {
             font-family: 'Sora', sans-serif;
             font-size: 13px;
-            font-weight: 300;
-            color: rgba(255,255,255,0.5);
-            line-height: 1.5;
+            font-weight: 500;
+            color: var(--card-dark);
+            opacity: 0.8;
+            line-height: 1.4;
           }
+
           .mobile-trust-badge {
             margin-top: 32px;
             padding: 12px 20px;
-            background: rgba(246,212,107,0.08);
-            border: 1px solid rgba(246,212,107,0.15);
+            background: rgba(246,212,107,0.1);
+            border: 1px solid rgba(246,212,107,0.2);
             border-radius: 100px;
             display: inline-flex;
             align-items: center;
@@ -335,29 +258,89 @@ const handleSubmit = async () => {
             text-transform: uppercase;
           }
 
-          /* 4. The White Form Bento Box */
-          .form-shell {
-            width: 100%;
-            max-width: 440px;
-            margin: 0 auto;
-            background: var(--card-light);
-            border-radius: 32px;
-            border: 1px solid var(--border-soft);
-            padding: 32px 24px max(24px, env(safe-area-inset-bottom));
-            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.05);
-            transform: none;
-            position: relative;
+          /* Bottom Sheet Mobile Form (Fixed scrolling and cut-offs) */
+          .right-panel {
+            position: fixed !important;
+            top: 10vh !important; /* Prevents top cut-off */
+            bottom: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            display: flex !important;
+            flex-direction: column;
+            align-items: center;
+            background: var(--bg-cream) !important;
+            border-radius: 36px 36px 0 0 !important;
+            padding: 0 !important; /* Padding moved to shell */
+            box-shadow: 0 -16px 48px rgba(0, 0, 0, 0.4) !important;
+            transform: translateY(100vh) !important; /* Pushed fully off-screen */
+            opacity: 0; /* Prevents hard-scroll rubber-banding visibility */
+            pointer-events: none;
+            transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.4s ease !important;
+            z-index: 100 !important;
+            height: auto !important;
+            max-height: none !important;
+            overflow: visible !important;
+          }
+          .right-panel.sheet-active {
+            transform: translateY(0) !important;
+            opacity: 1;
+            pointer-events: auto;
           }
 
-          /* Hide floating background transaction cards on mobile */
-          .txn-card { display: none !important; }
+          /* Visual Drag Pill */
+          .right-panel::before {
+            content: '';
+            position: absolute;
+            top: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 48px;
+            height: 5px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 10px;
+            z-index: 101;
+          }
+
+          /* The Scrolling Form Container */
+          .form-shell {
+            width: 100%;
+            height: 100%;
+            max-width: 100%;
+            margin: 0;
+            background: transparent !important;
+            border-radius: 0 !important;
+            border: none !important;
+            padding: 56px 24px max(40px, env(safe-area-inset-bottom)) !important;
+            box-shadow: none !important;
+            overflow-y: auto; /* Clean internal scrolling */
+            -webkit-overflow-scrolling: touch;
+          }
+
+          .mobile-brand { display: block; margin-bottom: 24px; }
           .hide-on-mobile { display: none; }
           .terminal-header { align-items: center; justify-content: center; text-align: center; }
 
-          /* Larger touch targets */
-          .field-input { padding: 15px 16px; }
-          .submit-btn { padding: 18px; font-size: 14px; margin-top: 14px; }
-          .form-title { font-size: clamp(24px, 7vw, 30px); margin-bottom: 8px; }
+          /* Mobile Bottom CTA Pinned Bar */
+          .mobile-cta-bar {
+            position: fixed; bottom: 0; left: 0; right: 0; z-index: 40;
+            padding: 20px 20px max(24px, env(safe-area-inset-bottom));
+            display: flex; flex-direction: column; gap: 12px;
+            background: linear-gradient(to top, var(--card-dark) 40%, rgba(28,28,30,0.9) 70%, transparent 100%);
+            pointer-events: none;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+          }
+          .mobile-cta-bar > * { pointer-events: auto; }
+          .mobile-cta-bar.hidden { opacity: 0; pointer-events: none; visibility: hidden; }
+
+          .mobile-cta-btn {
+            width: 100%; padding: 16px; border-radius: 16px; font-family: 'Sora', sans-serif;
+            font-size: 14px; font-weight: 600; letter-spacing: 0.04em;
+            display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer;
+            border: none; transition: transform 0.2s ease;
+          }
+          .mobile-cta-btn:active { transform: scale(0.98); }
+          .mobile-cta-btn.primary { background: var(--accent-mustard); color: var(--card-dark); box-shadow: 0 4px 16px rgba(246, 212, 107, 0.2); }
+          .mobile-cta-btn.secondary { background: var(--card-light); color: var(--card-dark); }
 
           /* Mobile Google Logic */
           .google-btn { display: none !important; }
