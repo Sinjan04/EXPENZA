@@ -878,8 +878,26 @@ useEffect(() => {
                                 <p className="font-mono text-[10px] text-[#5a5670] mt-1 tracking-wider uppercase">{formatTime(transaction.createdAt)}</p>
                               </div>
                             </div>
+                            
+                            {/* Missing Amount & Actions that got cut off */}
+                            <div className="flex flex-col items-end gap-1">
+                              <p className={`font-semibold text-[15px] tracking-tight ${transaction.type === 'income' ? 'text-[#34d399]' : 'text-[#f87171]'}`}>
+                                {transaction.type === 'income' ? '+' : '−'}₹{transaction.amount.toLocaleString('en-IN')}
+                              </p>
+                              <div className="flex items-center gap-2">
+                                <button onClick={() => openEditModal(transaction)} className="text-[9px] font-mono tracking-widest uppercase text-[#9ea4f5] hover:text-[#1c1c1e] transition-colors py-1">Edit</button>
+                                <button onClick={() => handleDeleteTransaction(transaction.id)} className="text-[9px] font-mono tracking-widest uppercase text-[#f87171] hover:text-[#ef4444] transition-colors py-1">Delete</button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
 
-{/* 3. Desktop Analytics Wrapper (Hidden on Mobile) */}
+              {/* 3. Desktop Analytics Wrapper (Hidden on Mobile) */}
               <div className="hidden lg:flex lg:flex-col lg:gap-8 w-full">
 
               {/* Cashflow Visualization */}
