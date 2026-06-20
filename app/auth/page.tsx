@@ -191,31 +191,31 @@ const handleSubmit = async () => {
           }
           .placeholder-bg { background: rgba(0,0,0,0.03); }
           
-          /* Dark Glass Text Pill Overlay */
+/* Clean Expenza Text Overlay */
           .slide-overlay {
             position: absolute;
             inset: 0;
             display: flex;
-            align-items: flex-end; /* Drops it to the lower half */
-            justify-content: center;
+            align-items: flex-end;
+            justify-content: flex-start; /* Aligns to the left */
             pointer-events: none;
-            padding-bottom: 12vh; /* Hovers it beautifully just above the wave */
+            padding: 0 24px 10vh 24px; /* Positions it in the bottom-left corner above the wave */
           }
           .slide-pill {
-            background: rgba(0, 0, 0, 0.12); /* Extremely subtle backdrop */
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-            color: #fdf5f0; /* Cream/Peach color */
-            padding: 8px 20px;
-            border-radius: 16px;
-            font-family: 'Caveat', cursive; /* Large elegant cursive */
-            font-size: 26px; 
-            font-weight: 500;
-            line-height: 1.2;
-            text-align: center;
+            background: transparent;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            color: var(--card-dark); /* Dark readable text matching Expenza brand */
+            padding: 0;
+            border-radius: 0;
+            font-family: 'Sora', sans-serif;
+            font-size: 22px; 
+            font-weight: 700; /* Bolder Expenza font */
+            line-height: 1.3;
+            text-align: left;
             max-width: 85%;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.05); /* Softer shadow */
-            border: 1px solid rgba(253, 245, 240, 0.15); /* Soft peach border */
+            box-shadow: none;
+            border: none;
           }
 
           /* SVG Wave */
@@ -359,14 +359,14 @@ const handleSubmit = async () => {
           .mobile-google-row { display: flex !important; }
         }
 
-        @media (min-width: 1025px) {
-          .mobile-only-divider,
-          .mobile-google-row,
-          .mobile-cta-bar,
-          .mobile-features,
-          .mobile-trust-badge {
-            display: none !important;
+       @media (min-width: 1025px) {
+          /* STRICTLY HIDES ALL MOBILE ELEMENTS FROM DESKTOP */
+          .mobile-only-divider, .mobile-google-row, .mobile-cta-bar, .mobile-features, .mobile-trust-badge, 
+          .mobile-carousel-wrapper { 
+            display: none !important; 
           }
+          .bg-stage { display: block !important; }
+        }
         }
 
         /* 5. Circular Google Button (Updated for Light Theme) */
