@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { signIn } from "next-auth/react";
 
@@ -14,6 +14,14 @@ const [showPassword, setShowPassword] = useState(false);
 const [showLoginSheet, setShowLoginSheet] = useState(false);
 const [errors, setErrors] = useState<{ email?: string; password?: string; name?: string }>({});
 const [rememberMe, setRememberMe] = useState(false);
+const [currentSlide, setCurrentSlide] = useState(0);
+
+useEffect(() => {
+  const timer = setInterval(() => {
+    setCurrentSlide((prev) => (prev === 2 ? 0 : prev + 1));
+  }, 6000); // Swipes every 6 seconds
+  return () => clearInterval(timer);
+}, []);
 
 const validate = () => {
   const newErrors: typeof errors = {};
@@ -152,116 +160,138 @@ const handleSubmit = async () => {
             flex-direction: column;
             min-height: 100vh;
             padding: 0;
-            background: var(--card-dark); /* Solid Charcoal Mobile Background */
+            background: #fdf5f0; /* Soft Peach background for narrative zone */
           }
-          .bg-stage { display: none; } /* Hide desktop bg on mobile */
+          .bg-stage { display: none; }
 
-          /* Dark Header Intro */
+          /* ── MOBILE CAROUSEL STYLES ── */
+          .mobile-carousel-wrapper {
+            display: block;
+            position: relative;
+            height: 55vh;
+            width: 100%;
+            overflow: hidden;
+            background: #f6efe8; /* Warm cream matching your asset */
+          }
+          .carousel-track {
+            display: flex;
+            height: 100%;
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+          }
+          .carousel-slide {
+            min-width: 100%;
+            height: 100%;
+            position: relative;
+          }
+          .slide-bg {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center 20%;
+          }
+          .placeholder-bg { background: rgba(0,0,0,0.03); }
+          
+          /* Dark Glass Text Pill Overlay */
+          .slide-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            padding-bottom: 5vh;
+          }
+          .slide-pill {
+            background: rgba(28, 28, 30, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: #ffffff;
+            padding: 12px 24px;
+            border-radius: 100px;
+            font-family: 'Sora', sans-serif;
+            font-size: 13px;
+            font-weight: 400;
+            line-height: 1.4;
+            text-align: center;
+            max-width: 80%;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            border: 1px solid rgba(255,255,255,0.1);
+          }
+
+          /* SVG Wave */
+          .wave-divider {
+            position: absolute;
+            bottom: -2px; /* Pulls it down slightly to prevent hairline gaps */
+            left: 0;
+            width: 100%;
+            line-height: 0;
+            z-index: 5;
+          }
+          .wave-divider svg { display: block; width: calc(100% + 1.3px); height: 40px; }
+
+          /* Carousel Pagination Dots */
+          .carousel-dots {
+            position: absolute;
+            bottom: 24px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            z-index: 10;
+          }
+          .carousel-dots .dot {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: rgba(28,28,30,0.15); transition: all 0.3s ease;
+          }
+          .carousel-dots .dot.active {
+            width: 20px; border-radius: 4px; background: var(--accent-mustard);
+          }
+
+          /* ── NARRATIVE ZONE (Below Wave) ── */
           .left-panel {
             display: flex !important;
             position: relative;
-            padding: max(6vh, env(safe-area-inset-top)) 16px 6vh; /* Adjusted for wider cards */
+            padding: 16px 24px 220px; /* Spaced perfectly above the sticky CTA */
             flex: 1 1 auto;
-            min-height: 100vh;
             text-align: center;
-            justify-content: center;
-            padding-bottom: 220px; /* Space for CTA bar */
+            justify-content: flex-start;
+            background: transparent;
           }
           .left-panel > div { width: 100%; }
           .brand-tag { 
-            font-size: 14px !important; 
-            margin-bottom: 16px !important; 
-            color: var(--card-light) !important;
-            letter-spacing: 0.3em !important;
-            opacity: 0.5;
+            font-size: 12px !important; 
+            margin-bottom: 12px !important; 
+            color: var(--accent-coral) !important;
+            letter-spacing: 0.25em !important;
+            font-weight: 600;
           }
           .hero-headline { 
-            font-size: 36px !important; 
+            font-size: 32px !important; 
             font-weight: 300 !important; 
-            color: var(--card-light) !important; 
+            color: var(--card-dark) !important; 
           }
           .hero-headline .accent-line { 
             display: block !important; 
-            margin-top: 6px;
+            margin-top: 4px;
             color: var(--accent-mustard) !important;
           }
-          .hero-sub, .stat-row, .center-divider { display: none !important; }
+          .hero-sub {
+            display: block !important; /* Forces the paragraph to show */
+            margin-top: 16px;
+            margin-left: auto;
+            margin-right: auto;
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-muted);
+            max-width: 90%;
+          }
+          .stat-row, .center-divider { display: none !important; }
 
-          /* Mobile Features Section (Solid Pastel Variants) */
-          .mobile-features {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            margin-top: 40px;
-            padding: 0; /* Removed padding to maximize width */
-            text-align: left;
-          }
-          .mobile-feature-item {
-            display: flex;
-            gap: 16px;
-            align-items: flex-start;
-            padding: 20px;
-            border-radius: 24px;
-            border: none;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-          }
-          
-          /* Pastel Bento Feature Cards */
-          .mobile-feature-item:nth-child(1) { background: var(--accent-sage); color: var(--card-dark); }
-          .mobile-feature-item:nth-child(2) { background: var(--accent-mustard); color: var(--card-dark); }
-          .mobile-feature-item:nth-child(3) { background: var(--accent-periwinkle); color: var(--card-dark); }
-
-          .mobile-feature-icon {
-            font-size: 24px;
-            width: 48px;
-            height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255,255,255,0.4);
-            border-radius: 16px;
-            flex-shrink: 0;
-            box-shadow: inset 0 2px 4px rgba(255,255,255,0.5);
-          }
-          .mobile-feature-title {
-            font-family: 'Sora', sans-serif;
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--card-dark);
-            margin-bottom: 4px;
-          }
-          .mobile-feature-desc {
-            font-family: 'Sora', sans-serif;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--card-dark);
-            opacity: 0.8;
-            line-height: 1.4;
-          }
-
-          .mobile-trust-badge {
-            margin-top: 32px;
-            padding: 12px 20px;
-            background: rgba(246,212,107,0.1);
-            border: 1px solid rgba(246,212,107,0.2);
-            border-radius: 100px;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            align-self: center;
-          }
-          .mobile-trust-badge span {
-            font-family: 'DM Mono', monospace;
-            font-size: 10px;
-            letter-spacing: 0.15em;
-            color: var(--accent-mustard);
-            text-transform: uppercase;
-          }
-
-          /* Bottom Sheet Mobile Form (Fixed scrolling and cut-offs) */
+          /* ── BOTTOM SHEET MOBILE FORM (Preserved) ── */
           .right-panel {
             position: fixed !important;
-            top: 10vh !important; /* Prevents top cut-off */
+            top: 10vh !important;
             bottom: 0 !important;
             left: 0 !important;
             right: 0 !important;
@@ -270,10 +300,10 @@ const handleSubmit = async () => {
             align-items: center;
             background: var(--bg-cream) !important;
             border-radius: 36px 36px 0 0 !important;
-            padding: 0 !important; /* Padding moved to shell */
+            padding: 0 !important;
             box-shadow: 0 -16px 48px rgba(0, 0, 0, 0.4) !important;
-            transform: translateY(100vh) !important; /* Pushed fully off-screen */
-            opacity: 0; /* Prevents hard-scroll rubber-banding visibility */
+            transform: translateY(100vh) !important;
+            opacity: 0;
             pointer-events: none;
             transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.4s ease !important;
             z-index: 100 !important;
@@ -286,36 +316,16 @@ const handleSubmit = async () => {
             opacity: 1;
             pointer-events: auto;
           }
-
-          /* Visual Drag Pill */
           .right-panel::before {
-            content: '';
-            position: absolute;
-            top: 16px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 48px;
-            height: 5px;
-            background: rgba(0,0,0,0.1);
-            border-radius: 10px;
-            z-index: 101;
+            content: ''; position: absolute; top: 16px; left: 50%; transform: translateX(-50%);
+            width: 48px; height: 5px; background: rgba(0,0,0,0.1); border-radius: 10px; z-index: 101;
           }
-
-          /* The Scrolling Form Container */
           .form-shell {
-            width: 100%;
-            height: 100%;
-            max-width: 100%;
-            margin: 0;
-            background: transparent !important;
-            border-radius: 0 !important;
-            border: none !important;
+            width: 100%; height: 100%; max-width: 100%; margin: 0;
+            background: transparent !important; border-radius: 0 !important; border: none !important;
             padding: 56px 24px max(40px, env(safe-area-inset-bottom)) !important;
-            box-shadow: none !important;
-            overflow-y: auto; /* Clean internal scrolling */
-            -webkit-overflow-scrolling: touch;
+            box-shadow: none !important; overflow-y: auto; -webkit-overflow-scrolling: touch;
           }
-
           .mobile-brand { display: block; margin-bottom: 24px; }
           .hide-on-mobile { display: none; }
           .terminal-header { align-items: center; justify-content: center; text-align: center; }
@@ -325,9 +335,8 @@ const handleSubmit = async () => {
             position: fixed; bottom: 0; left: 0; right: 0; z-index: 40;
             padding: 20px 20px max(24px, env(safe-area-inset-bottom));
             display: flex; flex-direction: column; gap: 12px;
-            background: linear-gradient(to top, var(--card-dark) 40%, rgba(28,28,30,0.9) 70%, transparent 100%);
-            pointer-events: none;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
+            background: linear-gradient(to top, #fdf5f0 50%, rgba(253,245,240,0.85) 75%, transparent 100%);
+            pointer-events: none; transition: opacity 0.3s ease, visibility 0.3s ease;
           }
           .mobile-cta-bar > * { pointer-events: auto; }
           .mobile-cta-bar.hidden { opacity: 0; pointer-events: none; visibility: hidden; }
@@ -340,7 +349,7 @@ const handleSubmit = async () => {
           }
           .mobile-cta-btn:active { transform: scale(0.98); }
           .mobile-cta-btn.primary { background: var(--accent-mustard); color: var(--card-dark); box-shadow: 0 4px 16px rgba(246, 212, 107, 0.2); }
-          .mobile-cta-btn.secondary { background: var(--card-light); color: var(--card-dark); }
+          .mobile-cta-btn.secondary { background: var(--card-light); color: var(--card-dark); border: 1px solid var(--border-soft); }
 
           /* Mobile Google Logic */
           .google-btn { display: none !important; }
@@ -843,12 +852,47 @@ const handleSubmit = async () => {
     fadeOut ? "auth-fade-out" : ""
   }`}
 >
-        {/* ── LEFT PANEL ── */}
-        <div className="left-panel" style={{display:'flex'}}>
+       {/* ── MOBILE HERO CAROUSEL ── */}
+        <div className="mobile-carousel-wrapper">
+          <div className="carousel-track" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
+            {/* Slide 1 */}
+            <div className="carousel-slide">
+              <img src="/onboarding/slide-1.png" alt="Track transactions" className="slide-bg" />
+              <div className="slide-overlay">
+                <div className="slide-pill">
+                  Track your transactions hassle free and on the go
+                </div>
+              </div>
+            </div>
+            {/* Slide 2 (Placeholder) */}
+            <div className="carousel-slide">
+              <div className="slide-bg placeholder-bg" />
+            </div>
+            {/* Slide 3 (Placeholder) */}
+            <div className="carousel-slide">
+              <div className="slide-bg placeholder-bg" />
+            </div>
+          </div>
+          
+          {/* SVG Curvy Wave matching the text zone's peach background */}
+          <div className="wave-divider">
+            <svg viewBox="0 0 1440 320" preserveAspectRatio="none">
+              <path fill="#fdf5f0" fillOpacity="1" d="M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,144C672,139,768,181,864,197.3C960,213,1056,203,1152,176C1248,149,1344,107,1392,85.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+            </svg>
+          </div>
+
+          {/* Dots */}
+          <div className="carousel-dots">
+            <div className={`dot ${currentSlide === 0 ? 'active' : ''}`} onClick={() => setCurrentSlide(0)} />
+            <div className={`dot ${currentSlide === 1 ? 'active' : ''}`} onClick={() => setCurrentSlide(1)} />
+            <div className={`dot ${currentSlide === 2 ? 'active' : ''}`} onClick={() => setCurrentSlide(2)} />
+          </div>
+        </div>
+
+        {/* ── LEFT PANEL (Desktop) / NARRATIVE ZONE (Mobile) ── */}
+        <div className="left-panel">
           <div>
-<div className="brand-tag">
-  EXPENZA
-</div>
+            <div className="brand-tag">EXPENZA</div>
             <h1 className="hero-headline">
               Your money,<br />
               <span className="accent-line">fully alive.</span>
@@ -871,36 +915,6 @@ const handleSubmit = async () => {
                 <div className="stat-num">24<span>/7</span></div>
                 <div className="stat-label">Live sync</div>
               </div>
-            </div>
-
-            {/* Mobile-only features section */}
-            <div className="mobile-features">
-              <div className="mobile-feature-item">
-                <div className="mobile-feature-icon">📊</div>
-                <div>
-                  <div className="mobile-feature-title">Track Every Rupee</div>
-                  <div className="mobile-feature-desc">Log income and expenses in seconds. Know exactly where your money goes.</div>
-                </div>
-              </div>
-              <div className="mobile-feature-item">
-                <div className="mobile-feature-icon">🎯</div>
-                <div>
-                  <div className="mobile-feature-title">Smart Budgets</div>
-                  <div className="mobile-feature-desc">Set category limits and get alerts before you overspend.</div>
-                </div>
-              </div>
-              <div className="mobile-feature-item">
-                <div className="mobile-feature-icon">🧠</div>
-                <div>
-                  <div className="mobile-feature-title">Deep Insights</div>
-                  <div className="mobile-feature-desc">Understand spending patterns with health scores and analytics.</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="mobile-trust-badge">
-              <span>✦</span>
-              <span>Trusted by 10,000+ users</span>
             </div>
           </div>
         </div>
