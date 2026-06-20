@@ -865,15 +865,24 @@ const handleSubmit = async () => {
                 </div>
               </div>
             </div>
-            {/* Slide 2 (Placeholder) */}
+{/* Slide 2 */}
             <div className="carousel-slide">
-              <div className="slide-bg placeholder-bg" />
+              <img src="/onboarding/slide-2.png" alt="Smart Budgets" className="slide-bg" />
+              <div className="slide-overlay">
+                <div className="slide-pill">
+                  Set smart budgets and see exactly where your money goes
+                </div>
+              </div>
             </div>
-            {/* Slide 3 (Placeholder) */}
+            {/* Slide 3 */}
             <div className="carousel-slide">
-              <div className="slide-bg placeholder-bg" />
+              <img src="/onboarding/slide-3.png" alt="Grow Wealth" className="slide-bg" />
+              <div className="slide-overlay">
+                <div className="slide-pill">
+                  Build your savings and watch your wealth grow effortlessly
+                </div>
+              </div>
             </div>
-          </div>
           
           {/* SVG Curvy Wave matching the text zone's peach background */}
           <div className="wave-divider">
