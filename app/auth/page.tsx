@@ -16,12 +16,40 @@ const [errors, setErrors] = useState<{ email?: string; password?: string; name?:
 const [rememberMe, setRememberMe] = useState(false);
 const [currentSlide, setCurrentSlide] = useState(0);
 
+// Swipe gesture states
+const [touchStart, setTouchStart] = useState<number | null>(null);
+const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
 useEffect(() => {
   const timer = setInterval(() => {
     setCurrentSlide((prev) => (prev === 2 ? 0 : prev + 1));
-  }, 6000); // Swipes every 6 seconds
+  }, 6000);
   return () => clearInterval(timer);
 }, []);
+
+// Swipe gesture handlers
+const handleTouchStart = (e: any) => {
+  setTouchEnd(null); // Reset touch end to prevent false swipes
+  setTouchStart(e.targetTouches[0].clientX);
+};
+
+const handleTouchMove = (e: any) => {
+  setTouchEnd(e.targetTouches[0].clientX);
+};
+
+const handleTouchEnd = () => {
+  if (!touchStart || !touchEnd) return;
+  const distance = touchStart - touchEnd;
+  const isLeftSwipe = distance > 50; // 50px threshold
+  const isRightSwipe = distance < -50;
+  
+  if (isLeftSwipe) {
+    setCurrentSlide((prev) => (prev === 2 ? 0 : prev + 1));
+  }
+  if (isRightSwipe) {
+    setCurrentSlide((prev) => (prev === 0 ? 2 : prev - 1));
+  }
+};
 
 const validate = () => {
   const newErrors: typeof errors = {};
@@ -360,15 +388,13 @@ const handleSubmit = async () => {
         }
 
        @media (min-width: 1025px) {
-          /* STRICTLY HIDES ALL MOBILE ELEMENTS FROM DESKTOP */
-          .mobile-only-divider, .mobile-google-row, .mobile-cta-bar, .mobile-features, .mobile-trust-badge, 
-          .mobile-carousel-wrapper { 
-            display: none !important; 
-          }
-          .bg-stage { display: block !important; }
-        }
-        }
-
+         /* STRICTLY HIDES ALL MOBILE ELEMENTS FROM DESKTOP */
+         .mobile-only-divider, .mobile-google-row, .mobile-cta-bar, .mobile-features, .mobile-trust-badge, 
+         .mobile-carousel-wrapper { 
+           display: none !important; 
+         }
+         .bg-stage { display: block !important; }
+       }
         /* 5. Circular Google Button (Updated for Light Theme) */
         .mobile-google-row {
           display: none;
@@ -853,8 +879,13 @@ const handleSubmit = async () => {
     fadeOut ? "auth-fade-out" : ""
   }`}
 >
-       {/* ── MOBILE HERO CAROUSEL ── */}
-        <div className="mobile-carousel-wrapper">
+{/* ── MOBILE HERO CAROUSEL ── */}
+        <div 
+          className="mobile-carousel-wrapper"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
           <div className="carousel-track" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
             {/* Slide 1 */}
             <div className="carousel-slide">
@@ -865,7 +896,7 @@ const handleSubmit = async () => {
                 </div>
               </div>
             </div>
-{/* Slide 2 */}
+            {/* Slide 2 */}
             <div className="carousel-slide">
               <img src="/onboarding/slide-2.png" alt="Smart Budgets" className="slide-bg" />
               <div className="slide-overlay">
@@ -883,6 +914,7 @@ const handleSubmit = async () => {
                 </div>
               </div>
             </div>
+          </div> {/* <-- THIS IS THE MISSING DIV THAT BROKE VERCEL! */}
           
           {/* SVG Curvy Wave matching the text zone's peach background */}
           <div className="wave-divider">
