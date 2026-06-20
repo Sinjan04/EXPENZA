@@ -227,14 +227,19 @@ const handleSubmit = async () => {
             align-items: flex-end;
             justify-content: flex-start;
             pointer-events: none;
-            padding: 0 24px 6vh 24px; /* Shifted further down towards the wave */
+            padding: 0 24px 6vh 24px;
+          }
+          /* Modifier for Slide 3 */
+          .slide-overlay.top-left {
+            align-items: flex-start;
+            padding: 10vh 24px 0 24px; /* Drops it safely below the top screen edge */
           }
           .slide-pill {
-            background: rgba(255, 255, 255, 0.25); /* Extremely slight light wash */
-            backdrop-filter: blur(4px); /* Just enough to soften the image details behind the text */
-            -webkit-backdrop-filter: blur(4px);
+            background: rgba(255, 255, 255, 0.15); /* Reduced wash further, no blur */
+            backdrop-filter: none; /* Blur entirely removed */
+            -webkit-backdrop-filter: none;
             color: var(--card-dark); 
-            padding: 12px 20px; /* Restored slight padding for the backdrop shape */
+            padding: 12px 20px; 
             border-radius: 16px;
             font-family: 'Sora', sans-serif;
             font-size: 22px; 
@@ -242,10 +247,9 @@ const handleSubmit = async () => {
             line-height: 1.3;
             text-align: left;
             max-width: 85%;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04); /* Whisper-thin shadow */
-            border: 1px solid rgba(255, 255, 255, 0.2); /* Ultra-soft edge */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02); 
+            border: 1px solid rgba(255, 255, 255, 0.15); 
           }
-
           /* SVG Wave */
           .wave-divider {
             position: absolute;
@@ -908,7 +912,7 @@ const handleSubmit = async () => {
             {/* Slide 3 */}
             <div className="carousel-slide">
               <img src="/onboarding/slide-3.png" alt="Grow Wealth" className="slide-bg" />
-              <div className="slide-overlay">
+              <div className="slide-overlay top-left">
                 <div className="slide-pill">
                   Build your savings and watch your wealth grow effortlessly
                 </div>
