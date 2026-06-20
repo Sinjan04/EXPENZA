@@ -113,7 +113,7 @@ const handleSubmit = async () => {
   return (
     <>
       <style>{`
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;600&family=DM+Mono:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;600&family=DM+Mono:wght@300;400;500&family=Caveat:wght@500;600&display=swap');
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -196,26 +196,26 @@ const handleSubmit = async () => {
             position: absolute;
             inset: 0;
             display: flex;
-            align-items: center;
+            align-items: flex-end; /* Drops it to the lower half */
             justify-content: center;
             pointer-events: none;
-            padding-bottom: 5vh;
+            padding-bottom: 12vh; /* Hovers it beautifully just above the wave */
           }
           .slide-pill {
-            background: rgba(28, 28, 30, 0.75);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            color: #ffffff;
-            padding: 12px 24px;
-            border-radius: 100px;
-            font-family: 'Sora', sans-serif;
-            font-size: 13px;
-            font-weight: 400;
-            line-height: 1.4;
+            background: rgba(0, 0, 0, 0.12); /* Extremely subtle backdrop */
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            color: #fdf5f0; /* Cream/Peach color */
+            padding: 8px 20px;
+            border-radius: 16px;
+            font-family: 'Caveat', cursive; /* Large elegant cursive */
+            font-size: 26px; 
+            font-weight: 500;
+            line-height: 1.2;
             text-align: center;
-            max-width: 80%;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-            border: 1px solid rgba(255,255,255,0.1);
+            max-width: 85%;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.05); /* Softer shadow */
+            border: 1px solid rgba(253, 245, 240, 0.15); /* Soft peach border */
           }
 
           /* SVG Wave */
@@ -252,7 +252,8 @@ const handleSubmit = async () => {
           .left-panel {
             display: flex !important;
             position: relative;
-            padding: 16px 24px 220px; /* Spaced perfectly above the sticky CTA */
+            padding: 0px 24px 250px; /* Reduced top padding, increased bottom padding to avoid buttons */
+            margin-top: -10px; /* Pulls it up snugly against the wave */
             flex: 1 1 auto;
             text-align: center;
             justify-content: flex-start;
