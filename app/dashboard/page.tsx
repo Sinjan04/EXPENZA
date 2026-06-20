@@ -532,17 +532,17 @@ useEffect(() => {
         .font-sora { font-family: 'Sora', sans-serif; }
         .font-mono { font-family: 'DM Mono', monospace; }
 
-        .glass-card {
-          background: linear-gradient(145deg, rgba(255,255,255,0.03) 0%, rgba(12,13,16,0.6) 100%);
-          border: 1px solid rgba(255,255,255,0.06);
-          border-top: 1px solid rgba(255,255,255,0.12);
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
-          box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+.glass-card {
+          background: rgba(255, 255, 255, 0.6);
+          border: 1px solid rgba(0, 0, 0, 0.04);
+          border-top: 1px solid rgba(255, 255, 255, 0.8);
+          backdrop-filter: blur(24px);
+          -webkit-backdrop-filter: blur(24px);
+          box-shadow: 0 12px 40px rgba(0, 0, 0, 0.03);
         }
 
         .gold-text-gradient {
-          background: linear-gradient(100deg, #ffe082 0%, #f0c040 100%);
+          background: linear-gradient(100deg, #d49a15 0%, #f0c040 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
@@ -561,94 +561,66 @@ useEffect(() => {
         }
 
         .btn-glass {
-          background: rgba(255,255,255,0.03);
-          border: 1px solid rgba(255,255,255,0.08);
+          background: rgba(0,0,0,0.03);
+          border: 1px solid rgba(0,0,0,0.05);
+          color: #5a5670;
           transition: all 0.2s ease;
         }
         .btn-glass:hover {
-          background: rgba(255,255,255,0.08);
-          border-color: rgba(255,255,255,0.15);
+          background: rgba(0,0,0,0.06);
+          border-color: rgba(0,0,0,0.1);
+          color: #1c1c1e;
         }
 
-        .fade-in-up {
-          animation: fadeInUp 0.8s cubic-bezier(.23,1,.32,1) both;
-        }
-
-        @keyframes fadeInUp {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-          /* Native Bottom Sheet Animations */
-        .sheet-overlay {
-          animation: fadeIn 0.3s ease both;
-        }
-        .sheet-slide-up {
-          animation: sheetSlideUp 0.5s cubic-bezier(0.32, 0.72, 0, 1) both;
-        }
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        @keyframes sheetSlideUp {
-          from { transform: translateY(100%); }
-          to { transform: translateY(0); }
-        }
-
-        .glow-pool-gold {
-          background: radial-gradient(circle, rgba(240,192,64,0.12) 0%, transparent 65%);
-        }
-        .glow-pool-emerald {
-          background: radial-gradient(circle, rgba(52,211,153,0.08) 0%, transparent 65%);
-        }
+        .fade-in-up { animation: fadeInUp 0.8s cubic-bezier(.23,1,.32,1) both; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .sheet-overlay { animation: fadeIn 0.3s ease both; }
+        .sheet-slide-up { animation: sheetSlideUp 0.5s cubic-bezier(0.32, 0.72, 0, 1) both; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes sheetSlideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
         .custom-input {
-          background: rgba(255,255,255,0.03);
-          border: 1px solid rgba(255,255,255,0.06);
+          background: rgba(0,0,0,0.02) !important;
+          border: 1px solid rgba(0,0,0,0.05) !important;
           transition: all 0.25s ease;
+          color: #1c1c1e !important;
         }
         .custom-input:focus {
-          background: rgba(240,192,64,0.05);
-          border-color: rgba(240,192,64,0.3);
-          box-shadow: 0 0 0 3px rgba(240,192,64,0.07);
+          background: #ffffff !important;
+          border-color: #f0c040 !important;
+          box-shadow: 0 0 0 3px rgba(240,192,64,0.15) !important;
           outline: none;
         }
 
-/* Custom Scrollbar for list */
-        .hide-scroll::-webkit-scrollbar { width: 0px; background: transparent; }
-        
-/* Native App Carousel Physics */
-        @media (max-width: 1024px) {
-          .mobile-carousel {
-            display: flex;
-            overflow-x: auto;
-            scroll-snap-type: x mandatory;
-            gap: 24px;
-            padding-bottom: 24px;
-            margin: 0;
-            padding: 0 0 20px 0;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-          }
-          .mobile-carousel::-webkit-scrollbar { display: none; }
-          .mobile-carousel > * { 
-            flex: 0 0 100%; 
-            scroll-snap-align: center; 
-            scroll-snap-stop: always; 
-            height: 100%; 
-          }
-        }
+        /* ── LIGHT THEME FORCED OVERRIDES ── */
+        .text-\\[\\#f4f0e8\\] { color: #1c1c1e !important; }
+        .text-\\[\\#9e98b0\\] { color: #5a5670 !important; }
+        .text-\\[\\#e0dceb\\] { color: #1c1c1e !important; }
+        .bg-\\[\\#1c1c1e\\] { background-color: rgba(255,255,255,0.95) !important; border: 1px solid rgba(0,0,0,0.04) !important; } 
+        .bg-\\[\\#0d2118\\] { background-color: rgba(52,211,153,0.1) !important; border: 1px solid rgba(52,211,153,0.2) !important; }
+        .bg-\\[\\#261012\\] { background-color: rgba(248,113,113,0.1) !important; border: 1px solid rgba(248,113,113,0.2) !important; }
+        .bg-\\[\\#241d0b\\] { background-color: rgba(240,192,64,0.1) !important; border: 1px solid rgba(240,192,64,0.2) !important; }
+        .border-white\/\\[0\\.04\\], .border-white\/\\[0\\.05\\], .border-white\/\\[0\\.06\\], .border-white\/\\[0\\.12\\], .border-white\/\\[0\\.1\\] { border-color: rgba(0,0,0,0.05) !important; }
+        .bg-white\/\\[0\\.01\\], .bg-white\/\\[0\\.015\\], .bg-white\/\\[0\\.03\\], .bg-white\/\\[0\\.05\\] { background-color: rgba(0,0,0,0.02) !important; }
+        .hover\\:bg-white\/\\[0\\.03\\]:hover, .hover\\:bg-white\/\\[0\\.04\\]:hover { background-color: rgba(0,0,0,0.05) !important; }
+        .text-white\/\\[0\\.03\\], .text-white\/\\[0\\.05\\], .text-white\/\\[0\\.1\\] { color: rgba(0,0,0,0.03) !important; }
+        .bg-\\[\\#0c0d10\\]\\/80, .bg-\\[\\#0c0d10\\]\\/95, .bg-\\[\\#121316\\]\\/80 { background-color: rgba(253, 245, 240, 0.85) !important; } /* Modals */
+        .text-white { color: #1c1c1e !important; } 
+        .bg-white\\/10 { background-color: rgba(0,0,0,0.04) !important; }
+        .bg-white\\/20 { background-color: rgba(0,0,0,0.08) !important; }
+        .border-white\\/5 { border-color: rgba(0,0,0,0.04) !important; }
+        .bg-black\\/40 { background-color: rgba(255,255,255,0.9) !important; }
+        .shadow-inner { box-shadow: 0 2px 8px rgba(0,0,0,0.03) !important; }
 
-        /* Premium Swipe Arrow Animation */
-        @keyframes swipeHint {
-          0%, 100% { transform: translateX(0); opacity: 0.4; color: #5a5670; }
-          50% { transform: translateX(4px); opacity: 1; color: #f0c040; }
-        }
-        .animate-swipe-hint { 
-          animation: swipeHint 2s cubic-bezier(0.4, 0, 0.2, 1) infinite; 
+        .hide-scroll::-webkit-scrollbar { width: 0px; background: transparent; }
+        @media (max-width: 1024px) {
+          .mobile-carousel { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 24px; padding-bottom: 24px; margin: 0; padding: 0 0 20px 0; scrollbar-width: none; -ms-overflow-style: none; }
+          .mobile-carousel::-webkit-scrollbar { display: none; }
+          .mobile-carousel > * { flex: 0 0 100%; scroll-snap-align: center; scroll-snap-stop: always; height: 100%; }
         }
       `}</style>
 
-<main className="min-h-screen pb-24 md:pb-0 bg-[#121316] text-[#f4f0e8] font-sora relative overflow-hidden selection:bg-[#f6d46b]/30 selection:text-black">
+      <main className="min-h-screen pb-24 md:pb-0 bg-[#fdf5f0] text-[#1c1c1e] font-sora relative overflow-hidden selection:bg-[#f6d46b]/30 selection:text-black">
         {/* Removed ambient orbs for clean, flat solid design */}
         {isLoading ? (
           <div className="relative z-10 mx-auto max-w-7xl px-6 py-12">
@@ -772,51 +744,51 @@ useEffect(() => {
 
          {/* Premium Insight Widget */}
           {showReminder && (
-            <div className="mb-8 relative rounded-2xl bg-[#13141a]/80 border border-white/[0.04] p-5 md:p-6 backdrop-blur-xl shadow-2xl fade-in-up flex flex-col md:flex-row md:items-center justify-between gap-5 overflow-hidden">
+            <div className="mb-8 relative rounded-2xl bg-white border border-black/[0.04] p-5 md:p-6 shadow-[0_8px_32px_rgba(0,0,0,0.04)] fade-in-up flex flex-col md:flex-row md:items-center justify-between gap-5 overflow-hidden">
               {/* Subtle top glow based on severity tier */}
               <div 
-                className="absolute top-0 inset-x-0 h-[1px] opacity-40" 
+                className="absolute top-0 inset-x-0 h-[3px] opacity-80" 
                 style={{ background: `linear-gradient(90deg, transparent 0%, ${reminderConfig.accentColor} 50%, transparent 100%)` }} 
               />
               
               <div className="flex gap-4 items-start">
-                {/* Minimalist Glowing Dot Indicator */}
+                {/* Minimalist Dot Indicator */}
                 <div className="mt-1.5 flex-shrink-0">
-                   <div className="relative flex items-center justify-center w-7 h-7 rounded-full border border-white/[0.08] bg-black/40 shadow-inner">
+                   <div className="relative flex items-center justify-center w-8 h-8 rounded-full border border-black/[0.04] bg-[#fdf5f0] shadow-sm">
                      <div 
-                       className="w-1.5 h-1.5 rounded-full" 
-                       style={{ backgroundColor: reminderConfig.accentColor, boxShadow: `0 0 10px ${reminderConfig.accentColor}` }} 
+                       className="w-2 h-2 rounded-full" 
+                       style={{ backgroundColor: reminderConfig.accentColor, boxShadow: `0 0 8px ${reminderConfig.accentColor}80` }} 
                      />
                    </div>
                 </div>
 
                 <div className="flex flex-col gap-1">
                   <span 
-                    className="font-mono text-[9px] tracking-[0.2em] uppercase" 
+                    className="font-mono text-[9px] tracking-[0.2em] uppercase font-medium" 
                     style={{ color: reminderConfig.accentColor }}
                   >
                     // {reminderConfig.tag}
                   </span>
-                  <h4 className="text-[15px] font-medium text-[#f4f0e8] tracking-tight mt-0.5">
+                  <h4 className="text-[16px] font-semibold text-[#1c1c1e] tracking-tight mt-0.5">
                     {reminderConfig.title}
                   </h4>
-                  <p className="text-[13px] font-light text-[#9e98b0] leading-relaxed max-w-xl mt-1">
+                  <p className="text-[13px] font-light text-[#5a5670] leading-relaxed max-w-xl mt-1">
                     {reminderConfig.text}
                   </p>
                 </div>
               </div>
               
               {/* Integrated Actions */}
-              <div className="flex items-center gap-2 pl-11 md:pl-0 flex-shrink-0">
+              <div className="flex items-center gap-3 pl-12 md:pl-0 flex-shrink-0">
                 <button 
                   onClick={() => { setTransactionError(""); setShowModal(true); dismissReminder(); }}
-                  className="text-[12px] font-medium px-4 py-2.5 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] text-[#f4f0e8] transition-all border border-white/[0.05] shadow-sm"
+                  className="text-[12px] font-medium px-5 py-2.5 rounded-xl bg-[#1c1c1e] hover:bg-[#2c2c2e] text-white transition-all shadow-md active:scale-95"
                 >
                   Log Activity
                 </button>
                 <button 
                   onClick={dismissReminder}
-                  className="text-[12px] font-medium px-4 py-2.5 rounded-lg text-[#5a5670] hover:text-[#f4f0e8] transition-colors"
+                  className="text-[12px] font-medium px-4 py-2.5 rounded-xl text-[#5a5670] hover:text-[#1c1c1e] hover:bg-black/5 transition-colors active:scale-95"
                 >
                   Dismiss
                 </button>
@@ -882,46 +854,30 @@ useEffect(() => {
                 </div>
               </div>
 
-              {/* 2. Split-Screen Ledger (Cream Bottom Overlay) */}
-              <div className="block lg:hidden w-[calc(100%+48px)] -mx-6 mt-4 bg-[#e2e5de] text-[#1c1c1e] rounded-t-[40px] p-8 shadow-[0_-12px_40px_rgba(0,0,0,0.2)] relative z-20" style={{ paddingBottom: '140px', marginBottom: '-120px' }}>
+              {/* 2. Split-Screen Ledger (Crisp White Drawer) */}
+              <div className="block lg:hidden w-[calc(100%+48px)] -mx-6 mt-4 bg-[#ffffff] text-[#1c1c1e] rounded-t-[40px] p-8 shadow-[0_-12px_40px_rgba(0,0,0,0.05)] relative z-20" style={{ paddingBottom: '140px', marginBottom: '-120px' }}>
                 
                 <div className="flex justify-between items-center mb-8">
                   <h3 className="text-xl font-medium tracking-tight">Transactions</h3>
-                  <span className="font-mono text-[10px] tracking-widest text-[#1c1c1e]/50 uppercase">Latest</span>
+                  <span className="font-mono text-[10px] tracking-widest text-[#5a5670] bg-black/[0.03] px-3 py-1 rounded-full uppercase">Latest</span>
                 </div>
                 
                 <div className="flex-1 overflow-visible space-y-5">
                   {groupedTransactions.length === 0 ? (
-                    <p className="text-[13px] text-[#1c1c1e]/50 text-center py-4">No recent activity.</p>
+                    <p className="text-[13px] text-[#5a5670] text-center py-4">No recent activity.</p>
                   ) : (
                     groupedTransactions.map((group) => (
                       <div key={group.label} className="space-y-4">
-                        <p className="font-mono text-[9px] tracking-widest text-[#1c1c1e]/40 uppercase mb-2 ml-2">{group.label}</p>
+                        <p className="font-mono text-[9px] tracking-widest text-[#5a5670] uppercase mb-2 ml-2">{group.label}</p>
                         {group.items.map((transaction) => (
-                          <div key={transaction.id} className="flex items-center justify-between bg-white rounded-[24px] p-4 shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-black/5">
+                          <div key={transaction.id} className="flex items-center justify-between bg-[#fdf5f0] rounded-[24px] p-4 shadow-[0_4px_16px_rgba(0,0,0,0.02)] border border-[#f28b82]/10 transition-transform active:scale-[0.98]">
                             <div className="flex items-center gap-4">
-                              <div className="w-12 h-12 rounded-full bg-[#e2e5de]/50 flex items-center justify-center text-xl">{getCategoryEmoji(transaction.category)}</div>
+                              <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-xl shadow-sm">{getCategoryEmoji(transaction.category)}</div>
                               <div>
                                 <p className="text-[15px] font-medium text-[#1c1c1e] truncate max-w-[120px]">{transaction.note || transaction.category}</p>
-                                <p className="font-mono text-[10px] text-[#1c1c1e]/40 mt-1 tracking-wider uppercase">{formatTime(transaction.createdAt)}</p>
+                                <p className="font-mono text-[10px] text-[#5a5670] mt-1 tracking-wider uppercase">{formatTime(transaction.createdAt)}</p>
                               </div>
                             </div>
-                                                    <div className="flex flex-col items-end gap-1">
-                              <p className={`font-semibold text-[15px] tracking-tight ${transaction.type === 'income' ? 'text-[#a1c8aa]' : 'text-[#f28b82]'}`}>
-                                {transaction.type === 'income' ? '+' : '−'}₹{transaction.amount.toLocaleString('en-IN')}
-                              </p>
-                              <div className="flex items-center gap-2">
-                                <button onClick={() => openEditModal(transaction)} className="text-[9px] font-mono tracking-widest uppercase text-[#9ea4f5] opacity-70 hover:opacity-100 py-1">Edit</button>
-                                <button onClick={() => handleDeleteTransaction(transaction.id)} className="text-[9px] font-mono tracking-widest uppercase text-[#f28b82] opacity-70 hover:opacity-100 py-1">Delete</button>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
 
 {/* 3. Desktop Analytics Wrapper (Hidden on Mobile) */}
               <div className="hidden lg:flex lg:flex-col lg:gap-8 w-full">
