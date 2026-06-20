@@ -61,6 +61,7 @@ const [transactionError, setTransactionError] = useState("");
   const [editAmount, setEditAmount] = useState("");
   const [editNote, setEditNote] = useState("");
   const [editDate, setEditDate] = useState("");
+  const [isEditSubmitting, setIsEditSubmitting] = useState(false);
   
 // Retention System State
   const [showReminder, setShowReminder] = useState(false);
@@ -267,40 +268,51 @@ useEffect(() => {
   };
 
   const handleEditTransaction = async () => {
-    if (!editTransaction) return;
+    if (!editTransaction || isEditSubmitting) return;
+    setIsEditSubmitting(true);
+    setTransactionError("");
+    
     const numAmount = Number(editAmount);
     if (!editAmount || numAmount <= 0) {
       setTransactionError("Amount must be greater than ₹0.");
+      setIsEditSubmitting(false);
       return;
     }
 
-    const token = localStorage.getItem("token");
-    const response = await fetch(`/api/transactions?id=${editTransaction.id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        authorization: token || "",
-      },
-      body: JSON.stringify({
-        amount: numAmount,
-        note: editNote,
-        createdAt: editDate ? new Date(editDate).toISOString() : editTransaction.createdAt,
-      }),
-    });
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`/api/transactions?id=${editTransaction.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: token || "",
+        },
+        body: JSON.stringify({
+          amount: numAmount,
+          note: editNote,
+          createdAt: editDate ? new Date(editDate).toISOString() : editTransaction.createdAt,
+        }),
+      });
 
-    if (!response.ok) {
-      const errData = await response.json();
-      setTransactionError(errData.error || "Failed to update transaction.");
-      return;
+      if (!response.ok) {
+        const errData = await response.json();
+        setTransactionError(errData.error || "Failed to update transaction.");
+        setIsEditSubmitting(false);
+        return;
+      }
+
+      setShowEditModal(false);
+      setEditTransaction(null);
+      setEditAmount("");
+      setEditNote("");
+      setEditDate("");
+      setTransactionError("");
+      await fetchDashboard();
+    } catch (err) {
+      setTransactionError("A network error occurred.");
+    } finally {
+      setIsEditSubmitting(false);
     }
-
-    setShowEditModal(false);
-    setEditTransaction(null);
-    setEditAmount("");
-    setEditNote("");
-    setEditDate("");
-    setTransactionError("");
-    await fetchDashboard();
   };
 
   const handleAddTransaction = async () => {
@@ -1558,7 +1570,14 @@ useEffect(() => {
               
               <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-[#f0c040] to-transparent opacity-20 hidden md:block" />
               
-              <div className="mb-8">
+              <button 
+                onClick={() => setShowModal(false)} 
+                className="absolute top-6 right-6 w-8 h-8 rounded-full bg-white/[0.03] border border-white/[0.05] flex items-center justify-center text-[#9e98b0] hover:text-white transition-colors z-10"
+              >
+                ✕
+              </button>
+
+              <div className="mb-8 pr-8">
                 <span className="font-mono text-[10px] tracking-[0.2em] text-[#f0c040] uppercase mb-2 block">
                   // New Entry
                 </span>
@@ -1708,7 +1727,14 @@ useEffect(() => {
               <div className="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-6 md:hidden" />
               <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-[#9ea4f5] to-transparent opacity-20 hidden md:block" />
               
-              <div className="mb-8">
+              <button 
+                onClick={() => { setShowEditModal(false); setTransactionError(""); }} 
+                className="absolute top-6 right-6 w-8 h-8 rounded-full bg-white/[0.03] border border-white/[0.05] flex items-center justify-center text-[#9e98b0] hover:text-white transition-colors z-10"
+              >
+                ✕
+              </button>
+
+              <div className="mb-8 pr-8">
                 <span className="font-mono text-[10px] tracking-[0.2em] text-[#9ea4f5] uppercase mb-2 block">
                   // Edit Entry
                 </span>
@@ -1717,6 +1743,7 @@ useEffect(() => {
                 </h2>
               </div>
 
+              {/* ... (The form fields stay exactly the same here) ... */}
               {transactionError && (
                 <div className="mb-6 p-4 rounded-xl bg-[#f87171]/10 border border-[#f87171]/20 flex items-center gap-3 fade-in-up">
                   <span className="text-[#f87171]">⚠️</span>
@@ -1777,9 +1804,17 @@ useEffect(() => {
                 </button>
                 <button
                   onClick={handleEditTransaction}
-                  className="flex-1 rounded-xl btn-gold py-4 text-[13px] font-semibold text-black flex items-center justify-center gap-2"
+                  disabled={isEditSubmitting}
+                  className="flex-1 rounded-xl btn-gold py-4 text-[13px] font-semibold text-black flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                 >
-                  Save Changes
+                  {isEditSubmitting ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    "Save Changes"
+                  )}
                 </button>
               </div>
             </div>
