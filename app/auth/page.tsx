@@ -197,25 +197,25 @@ const handleSubmit = async () => {
             inset: 0;
             display: flex;
             align-items: flex-end;
-            justify-content: flex-start; /* Aligns to the left */
+            justify-content: flex-start;
             pointer-events: none;
-            padding: 0 24px 10vh 24px; /* Positions it in the bottom-left corner above the wave */
+            padding: 0 24px 6vh 24px; /* Shifted further down towards the wave */
           }
           .slide-pill {
-            background: transparent;
-            backdrop-filter: none;
-            -webkit-backdrop-filter: none;
-            color: var(--card-dark); /* Dark readable text matching Expenza brand */
-            padding: 0;
-            border-radius: 0;
+            background: rgba(255, 255, 255, 0.25); /* Extremely slight light wash */
+            backdrop-filter: blur(4px); /* Just enough to soften the image details behind the text */
+            -webkit-backdrop-filter: blur(4px);
+            color: var(--card-dark); 
+            padding: 12px 20px; /* Restored slight padding for the backdrop shape */
+            border-radius: 16px;
             font-family: 'Sora', sans-serif;
             font-size: 22px; 
-            font-weight: 700; /* Bolder Expenza font */
+            font-weight: 700; 
             line-height: 1.3;
             text-align: left;
             max-width: 85%;
-            box-shadow: none;
-            border: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04); /* Whisper-thin shadow */
+            border: 1px solid rgba(255, 255, 255, 0.2); /* Ultra-soft edge */
           }
 
           /* SVG Wave */
