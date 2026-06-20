@@ -201,22 +201,21 @@ const handleSubmit = async () => {
             pointer-events: none;
             padding-bottom: 12vh; /* Hovers it beautifully just above the wave */
           }
-.slide-pill {
-            background: rgba(0, 0, 0, 0.12);
+          .slide-pill {
+            background: rgba(0, 0, 0, 0.12); /* Extremely subtle backdrop */
             backdrop-filter: blur(6px);
             -webkit-backdrop-filter: blur(6px);
-            color: var(--accent-coral); /* Beautiful pastel peach from our palette */
+            color: #fdf5f0; /* Cream/Peach color */
             padding: 8px 20px;
             border-radius: 16px;
-            font-family: 'Caveat', cursive;
-            font-size: 28px; /* Bumped up slightly for cursive readability */
-            font-weight: 600; /* Slightly bolder so it pops */
+            font-family: 'Caveat', cursive; /* Large elegant cursive */
+            font-size: 26px; 
+            font-weight: 500;
             line-height: 1.2;
             text-align: center;
             max-width: 85%;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.05);
-            border: 1px solid rgba(242, 139, 130, 0.2); /* Matching soft peach border */
-            text-shadow: 0 2px 8px rgba(0,0,0,0.1); /* Ensures readability against any image background */
+            box-shadow: 0 4px 24px rgba(0,0,0,0.05); /* Softer shadow */
+            border: 1px solid rgba(253, 245, 240, 0.15); /* Soft peach border */
           }
 
           /* SVG Wave */
